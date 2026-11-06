@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>9router & Relay</title>
+<title>9router</title>
 <!-- Cockpit CSP is default-src 'self': CSS/JS must be separate files (no inline). -->
 <link rel="stylesheet" href="site.css">
 <script src="../base1/cockpit.js"></script>
@@ -17,7 +17,7 @@
   <div class="brand">
     <div class="logo">9r</div>
     <div>
-      <h1>9router & Relay</h1>
+      <h1>9router</h1>
       <p>vps2 · 100.67.67.24</p>
     </div>
   </div>
@@ -63,41 +63,7 @@
     <dt>Dashboard (tailnet)</dt><dd><a href="https://9r.lampt.works" target="_blank" rel="noopener">https://9r.lampt.works</a></dd>
     <dt>API public</dt><dd><code>https://9r.lampt.works/v1</code> (cần API key)</dd>
     <dt>Local trên VPS</dt><dd><code>http://127.0.0.1:20128/v1</code></dd>
-    <dt>Relay</dt><dd><code>gw.lampt.works</code> → client mở <code>http://127.0.0.1:20130/v1</code></dd>
   </dl>
-</section>
-
-<section class="card">
-  <h2>Thiết bị relay</h2>
-  <p class="muted">Mỗi máy client có một khóa riêng (Noise IK). Thu hồi một máy không ảnh hưởng máy khác; các tunnel đang mở của máy đó đóng trong vòng 30 giây.</p>
-  <div class="table-scroll">
-    <table>
-      <thead><tr><th>Tên</th><th>ID</th><th>Ghép đôi lúc</th><th>Trạng thái</th><th></th></tr></thead>
-      <tbody id="devices"><tr><td colspan="5" class="muted">đang tải…</td></tr></tbody>
-    </table>
-  </div>
-  <p class="muted" id="pending"></p>
-
-  <h3>Tạo mã ghép đôi</h3>
-  <form id="pair-form" class="actions">
-    <input id="pair-name" class="input" type="text" maxlength="40" placeholder="Tên máy, ví dụ company-pc" required pattern="[A-Za-z0-9 ._\-]{1,40}">
-    <button class="btn primary" type="submit" id="pair-btn">Tạo mã (10 phút, dùng 1 lần)</button>
-  </form>
-  <div id="pair-result" hidden>
-    <p>Mã cho <b id="pair-for"></b>, hết hạn lúc <b id="pair-exp"></b>. Chạy trên máy đó, trong PowerShell mở bằng quyền Administrator:</p>
-    <div class="code"><pre><code id="pair-cmd"></code></pre></div>
-    <p class="note">Mã này là bí mật cho tới khi hết hạn: nó chứa invite dùng một lần và service token Cloudflare Access. Chuyển qua kênh an toàn, không dán vào chat công khai.</p>
-  </div>
-</section>
-
-<section class="card">
-  <h2>Relay client: tải về và hướng dẫn</h2>
-  <p>Hướng dẫn đầy đủ: <a href="/relay/" target="_blank" rel="noopener">manage.lampt.works/relay/</a>. Máy ngoài tailnet mở trang này qua Cloudflare Access, đăng nhập bằng email.</p>
-  <div class="dl">
-    <a href="/relay/download/9r-relay-windows-amd64.exe" download><b>9r-relay-windows-amd64.exe</b><span>Windows x64, chạy như Windows service</span></a>
-    <a href="/relay/download/SHA256SUMS.txt" download><b>SHA256SUMS.txt</b><span>kiểm tra file tải về</span></a>
-    <a href="https://github.com/lampt24/9router/releases?q=relay-v" target="_blank" rel="noopener"><b>GitHub Releases</b><span>các nền tảng khác</span></a>
-  </div>
 </section>
 
 </div>

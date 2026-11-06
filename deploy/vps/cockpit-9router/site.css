@@ -1,4 +1,4 @@
-/* Shared style for /relay/ and the Cockpit "9router & Relay" page.
+/* Style for the Cockpit "9router" page.
    External file on purpose: Cockpit's CSP (default-src 'self') blocks inline <style>. */
 :root {
   --bg: #f6f7f9; --surface: #ffffff; --surface-2: #f0f2f5; --line: #e2e5ea;

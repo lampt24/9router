@@ -1,5 +1,5 @@
 {
   "version": 0,
   "name": "9router",
-  "menu": { "index": { "label": "9router & Relay", "order": 5 } }
+  "menu": { "index": { "label": "9router", "order": 5 } }
 }

@@ -19,41 +19,15 @@
 	}
 }
 
-# Relay origin for the Cloudflare "relay.lampt.works" TCP-over-WebSocket path.
-# cloudflared forwards raw TCP here; going through Caddy guarantees an
-# X-Forwarded-For header, so 9router marks the request "via proxy" and never
-# treats it as a trusted local (keyless/admin) request. Only /v1 is exposed.
-http://:20129 {
-	bind 127.0.0.1
-	@v1 path /v1 /v1/*
-	handle @v1 {
-		reverse_proxy 127.0.0.1:20128 {
-			header_up -X-Real-IP
-			header_up X-Forwarded-For "relay"
-			flush_interval -1
-			transport http {
-				read_timeout 0
-				write_timeout 0
-			}
-		}
-	}
-	handle {
-		respond 404
-	}
-}
-
-# VPS admin (tailnet only): Cockpit + static relay docs/downloads at /relay/
+# VPS admin (tailnet only): Cockpit. Add-ons can mount extra routes in front of it
+# by dropping files into /etc/caddy-extra/manage/ on the host.
 manage.lampt.works {
 	tls {
 		dns cloudflare {$CF_DNS_API_TOKEN}
 		resolvers 1.1.1.1
 	}
 	encode zstd gzip
-	redir /relay /relay/
-	handle /relay/* {
-		root * /srv/manage
-		file_server
-	}
+	import /etc/caddy/extra/manage/*.caddy
 	handle {
 		reverse_proxy 127.0.0.1:9090 {
 			header_up X-Forwarded-Proto https
@@ -61,16 +35,6 @@ manage.lampt.works {
 	}
 }
 
-# Public origin for manage.lampt.works/relay/* via Cloudflare tunnel (+ Access email policy).
-# Only the static relay docs are reachable here; Cockpit is never exposed publicly.
-http://:20131 {
-	bind 127.0.0.1
-	redir /relay /relay/
-	handle /relay/* {
-		root * /srv/manage
-		file_server
-	}
-	handle {
-		respond 404
-	}
-}
+# Add-on sites (host /etc/caddy-extra/*.caddy, static files under /srv/caddy-extra),
+# Empty directories are fine.
+import /etc/caddy/extra/*.caddy

@@ -56,7 +56,9 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy-data:/data
       - ./caddy-config:/config
-      - ./manage:/srv/manage:ro
+      # add-on sites + their static files (installed on the host by other projects)
+      - /etc/caddy-extra:/etc/caddy/extra:ro
+      - /srv/caddy-extra:/srv/extra:ro
 
   # Split DNS for the tailnet: 9r.lampt.works -> Tailscale IP
   coredns:
@@ -83,25 +85,3 @@ services:
     command: ["tunnel", "--no-autoupdate", "run"]
     environment:
       TUNNEL_TOKEN: ${TUNNEL_TOKEN}
-
-  # 9r-relay v1 server (Go): Noise-encrypted tunnels from paired devices.
-  # Cloudflare tunnel gw.lampt.works -> 127.0.0.1:20140 (Access service token at the edge),
-  # decrypted stream -> Caddy 127.0.0.1:20129 (only /v1, forces X-Forwarded-For) -> 9router.
-  relay-server:
-    image: ghcr.io/lampt24/9r-relay-server:${RELAY_TAG:-latest}
-    container_name: relay-server
-    restart: unless-stopped
-    network_mode: host
-    user: "65532:65532"
-    read_only: true
-    cap_drop: [ALL]
-    security_opt: [no-new-privileges:true]
-    environment:
-      RELAY_STATE: /data/state.json
-      RELAY_LISTEN: 127.0.0.1:20140
-      RELAY_UPSTREAM: 127.0.0.1:20129
-      RELAY_PUBLIC_URL: wss://gw.lampt.works/v1/tunnel
-      CF_ACCESS_CLIENT_ID: ${RELAY_CF_ID}
-      CF_ACCESS_CLIENT_SECRET: ${RELAY_CF_SECRET}
-    volumes:
-      - ./relay-data:/data

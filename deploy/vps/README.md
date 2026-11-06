@@ -57,20 +57,26 @@ journalctl -u 9router-update -n 50
 Each service only receives its own secrets (compose interpolation, no shared `env_file`).
 Host: `/opt/9router/.env` root:600; `data*` owned by 10020, `caddy-*` by 10010, all 700.
 
-## Relay & admin (added 2026-11-06)
+## Admin (added 2026-11-06)
 
 | hostname | public (Cloudflare) | tailnet |
 |---|---|---|
 | `9r.lampt.works` | only `/v1` (API key) + Access email app on the rest | dashboard via Caddy |
-| `gw.lampt.works` | 9r-relay v1 (see `relay/README.md`): Access **service token** → `relay-server` 127.0.0.1:20140 (Noise IK, per-device keys) → Caddy 127.0.0.1:20129 (only `/v1`) | — |
-| `manage.lampt.works` | only `/relay/*` static docs (Access email) → Caddy `127.0.0.1:20131` | Cockpit (`127.0.0.1:9090`) + `/relay/` |
+| `manage.lampt.works` | — | Cockpit (`127.0.0.1:9090`) |
 
 * Cockpit: `cockpit-ws` socket bound to 127.0.0.1:9090 (`/etc/systemd/system/cockpit.socket.d/listen.conf`), `/etc/cockpit/cockpit.conf` Origins=https://manage.lampt.works. Login user `vpsadmin` (sudo, password in `/root/vpsadmin.pw`; SSH password auth is disabled so it only works in Cockpit).
-* Plugin `cockpit-9router/` → `/usr/share/cockpit/9router/`. Static relay page `manage/` → `/opt/9router/manage` (mounted ro into Caddy).
+* Plugin `cockpit-9router/` → `/usr/share/cockpit/9router/`.
 * Tailscale split DNS must list both `9r.lampt.works` and `manage.lampt.works` → 100.67.67.24 (CoreDNS).
 
-## 9r-relay (Go)
+## Add-ons
 
-* `relay-server` container (`ghcr.io/lampt24/9r-relay-server`, uid 65532, read-only, no caps), state in `relay-data/state.json` (server key, devices, hashed invites). `RELAY_CF_ID/RELAY_CF_SECRET` in `.env` are embedded in pairing codes.
-* Pair / list / revoke: Cockpit → 9router & Relay, or `docker exec relay-server /9r-relay-server pair-new|devices|revoke`.
-* `fetch-relay-client.sh` (run by the update timer) mirrors the latest `relay-v*` Windows binaries into `manage/relay/download/` after verifying SHA256SUMS.
+Caddy imports add-on config that other projects install on the host (empty directories are fine):
+
+| host path | mounted at | used for |
+|---|---|---|
+| `/etc/caddy-extra/*.caddy` | `/etc/caddy/extra` | extra sites |
+| `/etc/caddy-extra/manage/*.caddy` | (same) | routes inside `manage.lampt.works`, ahead of Cockpit |
+| `/srv/caddy-extra/` | `/srv/extra` | static files for those routes |
+
+Caddy runs with `admin off`, so an add-on that changes its files restarts the `caddy` container.
+The `cloudflared` tunnel is shared: its ingress rules live in Cloudflare.
