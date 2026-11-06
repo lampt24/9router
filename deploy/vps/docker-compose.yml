@@ -10,7 +10,7 @@ services:
     container_name: 9router
     restart: unless-stopped
     network_mode: host
-    user: "1000:1000"                # 'node' in the image; skip the root su-exec entrypoint
+    user: "10020:10020"              # dedicated uid (NOT the host dev user); skips the root su-exec entrypoint
     entrypoint: []
     command: ["node", "custom-server.js"]
     cap_drop: [ALL]
