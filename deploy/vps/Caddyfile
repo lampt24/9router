@@ -41,3 +41,36 @@ http://:20129 {
 		respond 404
 	}
 }
+
+# VPS admin (tailnet only): Cockpit + static relay docs/downloads at /relay/
+manage.lampt.works {
+	tls {
+		dns cloudflare {$CF_DNS_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+	encode zstd gzip
+	redir /relay /relay/
+	handle /relay/* {
+		root * /srv/manage
+		file_server
+	}
+	handle {
+		reverse_proxy 127.0.0.1:9090 {
+			header_up X-Forwarded-Proto https
+		}
+	}
+}
+
+# Public origin for manage.lampt.works/relay/* via Cloudflare tunnel (+ Access email policy).
+# Only the static relay docs are reachable here; Cockpit is never exposed publicly.
+http://:20131 {
+	bind 127.0.0.1
+	redir /relay /relay/
+	handle /relay/* {
+		root * /srv/manage
+		file_server
+	}
+	handle {
+		respond 404
+	}
+}

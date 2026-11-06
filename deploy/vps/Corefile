@@ -9,3 +9,14 @@
     log
     errors
 }
+
+manage.lampt.works:53 {
+    bind 100.67.67.24
+    template IN A manage.lampt.works {
+        answer "manage.lampt.works. 60 IN A 100.67.67.24"
+    }
+    template IN AAAA manage.lampt.works {
+        rcode NOERROR
+    }
+    errors
+}

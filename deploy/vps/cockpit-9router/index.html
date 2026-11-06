@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>9router & Relay</title>
+<script src="../base1/cockpit.js"></script>
+<script src="app.js"></script>
+<style>
+body{padding:20px;font:14px/1.6 system-ui,sans-serif}
+h1{font-size:22px;margin:0 0 8px}h2{font-size:17px;margin:22px 0 8px}
+table{border-collapse:collapse}td,th{padding:4px 14px 4px 0;text-align:left;vertical-align:top}th{opacity:.7;font-weight:600}
+pre{background:rgba(127,127,127,.12);padding:10px;border-radius:6px;overflow-x:auto;margin:0}
+code{background:rgba(127,127,127,.12);padding:1px 4px;border-radius:4px}
+.ok{color:#3e8635}.bad{color:#c9190b}
+button{margin:10px 6px 0 0;padding:6px 12px;border-radius:4px;border:1px solid rgba(127,127,127,.5);background:transparent;color:inherit;cursor:pointer}
+button.primary{background:#0066cc;color:#fff;border-color:#0066cc}
+</style>
+</head>
+<body>
+<h1>9router & Relay</h1>
+
+<h2>Trạng thái</h2>
+<table>
+<tr><th>9router /api/health</th><td id="health">…</td></tr>
+<tr><th>Containers</th><td><pre id="ps">…</pre></td></tr>
+<tr><th>Tự cập nhật</th><td><pre id="timer">…</pre></td></tr>
+</table>
+<button id="refresh">Làm mới</button>
+<button id="update" class="primary">Cập nhật 9router ngay</button>
+<pre id="out" hidden></pre>
+
+<h2>Địa chỉ truy cập</h2>
+<table>
+<tr><th>Dashboard (tailnet)</th><td><a href="https://9r.lampt.works" target="_blank" rel="noopener">https://9r.lampt.works</a></td></tr>
+<tr><th>API public</th><td><code>https://9r.lampt.works/v1</code> (cần API key)</td></tr>
+<tr><th>Local trên VPS</th><td><code>http://127.0.0.1:20128/v1</code></td></tr>
+<tr><th>Relay</th><td><code>gw.lampt.works</code> → client mở <code>http://127.0.0.1:20130/v1</code></td></tr>
+</table>
+
+<h2>Relay: hướng dẫn client và file tải về</h2>
+<p><a href="https://manage.lampt.works/relay/" target="_blank" rel="noopener">https://manage.lampt.works/relay/</a> (máy ngoài tailnet mở qua Cloudflare Access bằng email)</p>
+<ul>
+<li><a href="https://manage.lampt.works/relay/download/9r-relay.ps1" target="_blank" rel="noopener">9r-relay.ps1</a> (Windows)</li>
+<li><a href="https://manage.lampt.works/relay/download/9r-relay.sh" target="_blank" rel="noopener">9r-relay.sh</a> (Linux/macOS)</li>
+<li><a href="https://github.com/cloudflare/cloudflared/releases/latest" target="_blank" rel="noopener">cloudflared releases</a></li>
+</ul>
+</body>
+</html>

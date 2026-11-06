@@ -56,6 +56,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy-data:/data
       - ./caddy-config:/config
+      - ./manage:/srv/manage:ro
 
   # Split DNS for the tailnet: 9r.lampt.works -> Tailscale IP
   coredns:

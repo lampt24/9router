@@ -56,3 +56,15 @@ journalctl -u 9router-update -n 50
 `no-new-privileges` is not set on caddy/coredns because it would block the file capability they need to bind :443/:53 on the host network namespace.
 Each service only receives its own secrets (compose interpolation, no shared `env_file`).
 Host: `/opt/9router/.env` root:600; `data*` owned by 10020, `caddy-*` by 10010, all 700.
+
+## Relay & admin (added 2026-11-06)
+
+| hostname | public (Cloudflare) | tailnet |
+|---|---|---|
+| `9r.lampt.works` | only `/v1` (API key) + Access email app on the rest | dashboard via Caddy |
+| `gw.lampt.works` | TCP relay → Caddy `127.0.0.1:20129` (only `/v1`, forces XFF) — Access **service token** only | — |
+| `manage.lampt.works` | only `/relay/*` static docs (Access email) → Caddy `127.0.0.1:20131` | Cockpit (`127.0.0.1:9090`) + `/relay/` |
+
+* Cockpit: `cockpit-ws` socket bound to 127.0.0.1:9090 (`/etc/systemd/system/cockpit.socket.d/listen.conf`), `/etc/cockpit/cockpit.conf` Origins=https://manage.lampt.works. Login user `vpsadmin` (sudo, password in `/root/vpsadmin.pw`; SSH password auth is disabled so it only works in Cockpit).
+* Plugin `cockpit-9router/` → `/usr/share/cockpit/9router/`. Static relay page `manage/` → `/opt/9router/manage` (mounted ro into Caddy).
+* Tailscale split DNS must list both `9r.lampt.works` and `manage.lampt.works` → 100.67.67.24 (CoreDNS).

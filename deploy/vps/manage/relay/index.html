@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9router Relay</title>
+<style>
+:root{--bg:#f7f7f5;--fg:#1d1d1b;--muted:#5f5f5a;--card:#fff;--line:#e3e2dc;--accent:#2f6f5e;--code:#f0efea;--warn:#8a5a00;--warnbg:#fff6e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--fg:#ecebe6;--muted:#a5a49c;--card:#1f1f1d;--line:#33332f;--accent:#7cc4ad;--code:#2a2a27;--warn:#f2c46b;--warnbg:#2e2614}}
+:root[data-theme="dark"]{--bg:#161615;--fg:#ecebe6;--muted:#a5a49c;--card:#1f1f1d;--line:#33332f;--accent:#7cc4ad;--code:#2a2a27;--warn:#f2c46b;--warnbg:#2e2614}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:860px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:32px 0 10px}
+.sub{color:var(--muted);margin:0 0 24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0}
+pre{background:var(--code);border-radius:8px;padding:12px 14px;overflow-x:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;margin:8px 0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.92em;background:var(--code);padding:1px 5px;border-radius:4px}
+pre code{background:none;padding:0}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;width:38%}
+a{color:var(--accent)}
+.dl{display:flex;flex-wrap:wrap;gap:10px}
+.dl a{display:inline-block;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;text-decoration:none}
+.warn{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:10px 14px}
+ol li{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>9router Relay</h1>
+<p class="sub">Kết nối tới 9router trên vps2 từ mạng bị chặn, qua Cloudflare (HTTPS 443).</p>
+
+<div class="card">
+<pre><code>Codex / SDK ──http──► 127.0.0.1:20130  (relay client: cloudflared access tcp)
+   ══ WebSocket qua HTTPS :443 ══► Cloudflare Access  (bắt buộc service token)
+   ──► tunnel 9router-vps2 ──► Caddy 127.0.0.1:20129  (chỉ /v1, luôn gắn X-Forwarded-For)
+   ──► 9router 127.0.0.1:20128  (bắt buộc API key)</code></pre>
+<table>
+<tr><th>Relay hostname</th><td><code>gw.lampt.works</code></td></tr>
+<tr><th>Cổng local trên máy client</th><td><code>127.0.0.1:20130</code> (chỉ loopback)</td></tr>
+<tr><th>Base URL cho client</th><td><code>http://127.0.0.1:20130/v1</code></td></tr>
+<tr><th>Lớp xác thực 1</th><td>Cloudflare Access service token <code>9r-relay-company</code> (hết hạn 2027-11-06)</td></tr>
+<tr><th>Lớp xác thực 2</th><td>API key 9router riêng cho từng máy</td></tr>
+<tr><th>Phạm vi</th><td>Chỉ <code>/v1/*</code>. Dashboard và API quản trị trả 404 kể cả khi có đủ credential.</td></tr>
+</table>
+</div>
+
+<h2>Tải về</h2>
+<div class="dl">
+<a href="download/9r-relay.ps1" download>9r-relay.ps1 (Windows)</a>
+<a href="download/9r-relay.sh" download>9r-relay.sh (Linux/macOS)</a>
+<a href="download/README.md" download>README.md</a>
+<a href="https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.msi">cloudflared cho Windows (.msi, chính thức)</a>
+<a href="https://github.com/cloudflare/cloudflared/releases/latest">cloudflared — các nền tảng khác</a>
+</div>
+
+<h2>Cài đặt trên Windows</h2>
+<ol>
+<li>Cài cloudflared: <code>winget install --id Cloudflare.cloudflared</code>, hoặc dùng file .msi ở trên.</li>
+<li>Tải <code>9r-relay.ps1</code> vào một thư mục, ví dụ <code>%USERPROFILE%\9r-relay</code>.</li>
+<li>Lần đầu chạy để nhập service token. Script sẽ hỏi <b>Client ID</b> và <b>Client Secret</b>, rồi lưu vào <code>%USERPROFILE%\.9r-relay\credentials.json</code> (chỉ user của bạn đọc được):
+<pre><code>powershell -ExecutionPolicy Bypass -File .\9r-relay.ps1 -Setup</code></pre></li>
+<li>Các lần sau chỉ cần chạy và giữ cửa sổ mở:
+<pre><code>powershell -ExecutionPolicy Bypass -File .\9r-relay.ps1</code></pre></li>
+<li>Kiểm tra (kết quả mong đợi là 200):
+<pre><code>curl http://127.0.0.1:20130/v1/models -H "Authorization: Bearer &lt;API key&gt;"</code></pre></li>
+</ol>
+<p class="warn">Service token và API key <b>không</b> có trên trang này. Lấy chúng từ máy nhà: <code>C:\Users\lampt\.9r-relay\credentials.json</code> và <code>api-key.txt</code>. Tạo key riêng cho từng máy trong dashboard 9router (Endpoint → API keys).</p>
+
+<h2>Cấu hình Codex trên máy client</h2>
+<p>File <code>%USERPROFILE%\.codex\config.toml</code>:</p>
+<pre><code>model = "cx/gpt-6.1-sol"
+model_provider = "9router"
+model_context_window = 500000
+
+[model_providers.9router]
+name = "9Router (relay)"
+base_url = "http://127.0.0.1:20130/v1"
+wire_api = "responses"
+http_headers = { Authorization = "Bearer &lt;API key&gt;" }</code></pre>
+<p>SDK tương thích OpenAI: <code>OPENAI_BASE_URL=http://127.0.0.1:20130/v1</code>, <code>OPENAI_API_KEY=&lt;API key&gt;</code>.</p>
+
+<h2>Xử lý sự cố</h2>
+<table>
+<tr><th><code>websocket: bad handshake</code></th><td>Service token sai hoặc đã hết hạn. Chạy lại với <code>-Setup</code>.</td></tr>
+<tr><th>401 từ <code>/v1</code></th><td>Thiếu API key, hoặc key sai/đã bị thu hồi.</td></tr>
+<tr><th>404</th><td>Đường dẫn không phải <code>/v1/*</code>. Relay cố ý chặn các đường còn lại.</td></tr>
+<tr><th>Không kết nối được tới <code>gw.lampt.works</code></th><td>Mạng chặn cả domain. Báo admin để chuyển relay sang hostname khác.</td></tr>
+</table>
+</main>
+</body>
+</html>

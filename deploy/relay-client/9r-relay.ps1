@@ -1,7 +1,7 @@
 <#
   9router relay client (Windows).
   Opens http://127.0.0.1:<Port> locally and carries it as TCP-over-WebSocket
-  through Cloudflare (HTTPS :443) to relay.lampt.works -> vps2 -> 9router /v1.
+  through Cloudflare (HTTPS :443) to gw.lampt.works -> vps2 -> 9router /v1.
 
   Auth layer 1: Cloudflare Access service token (stored in %USERPROFILE%\.9r-relay\credentials.json)
   Auth layer 2: 9router API key (sent by your client, e.g. Codex)
@@ -12,7 +12,7 @@
 #>
 param(
   [int]$Port = 20130,
-  [string]$Hostname = "relay.lampt.works",
+  [string]$Hostname = "gw.lampt.works",
   [switch]$Setup
 )
 $ErrorActionPreference = "Stop"
