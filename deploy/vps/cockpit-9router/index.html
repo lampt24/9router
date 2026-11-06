@@ -2,47 +2,84 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>9router & Relay</title>
+<!-- Cockpit CSP is default-src 'self': CSS/JS must be separate files (no inline). -->
+<link rel="stylesheet" href="site.css">
 <script src="../base1/cockpit.js"></script>
+<script src="copy.js"></script>
 <script src="app.js"></script>
-<style>
-body{padding:20px;font:14px/1.6 system-ui,sans-serif}
-h1{font-size:22px;margin:0 0 8px}h2{font-size:17px;margin:22px 0 8px}
-table{border-collapse:collapse}td,th{padding:4px 14px 4px 0;text-align:left;vertical-align:top}th{opacity:.7;font-weight:600}
-pre{background:rgba(127,127,127,.12);padding:10px;border-radius:6px;overflow-x:auto;margin:0}
-code{background:rgba(127,127,127,.12);padding:1px 4px;border-radius:4px}
-.ok{color:#3e8635}.bad{color:#c9190b}
-button{margin:10px 6px 0 0;padding:6px 12px;border-radius:4px;border:1px solid rgba(127,127,127,.5);background:transparent;color:inherit;cursor:pointer}
-button.primary{background:#0066cc;color:#fff;border-color:#0066cc}
-</style>
 </head>
 <body>
-<h1>9router & Relay</h1>
+<div class="wrap">
 
-<h2>Trạng thái</h2>
-<table>
-<tr><th>9router /api/health</th><td id="health">…</td></tr>
-<tr><th>Containers</th><td><pre id="ps">…</pre></td></tr>
-<tr><th>Tự cập nhật</th><td><pre id="timer">…</pre></td></tr>
-</table>
-<button id="refresh">Làm mới</button>
-<button id="update" class="primary">Cập nhật 9router ngay</button>
-<pre id="out" hidden></pre>
+<header class="hero">
+  <div class="brand">
+    <div class="logo">9r</div>
+    <div>
+      <h1>9router & Relay</h1>
+      <p>vps2 · 100.67.67.24</p>
+    </div>
+  </div>
+  <div class="actions">
+    <button id="refresh" class="btn" type="button">Làm mới</button>
+    <button id="update" class="btn primary" type="button">Cập nhật 9router</button>
+  </div>
+</header>
 
-<h2>Địa chỉ truy cập</h2>
-<table>
-<tr><th>Dashboard (tailnet)</th><td><a href="https://9r.lampt.works" target="_blank" rel="noopener">https://9r.lampt.works</a></td></tr>
-<tr><th>API public</th><td><code>https://9r.lampt.works/v1</code> (cần API key)</td></tr>
-<tr><th>Local trên VPS</th><td><code>http://127.0.0.1:20128/v1</code></td></tr>
-<tr><th>Relay</th><td><code>gw.lampt.works</code> → client mở <code>http://127.0.0.1:20130/v1</code></td></tr>
-</table>
+<div class="grid">
+  <section class="card">
+    <h2>9router</h2>
+    <p><span id="health" class="pill">đang kiểm tra…</span></p>
+    <p class="muted" id="version"></p>
+  </section>
+  <section class="card">
+    <h2>Cloudflare tunnel</h2>
+    <p><span id="tunnel" class="pill">đang kiểm tra…</span></p>
+    <p class="muted" id="tunnel-detail"></p>
+  </section>
+  <section class="card">
+    <h2>Tự cập nhật</h2>
+    <p><span id="timer" class="pill">đang kiểm tra…</span></p>
+    <p class="muted" id="timer-detail"></p>
+  </section>
+</div>
 
-<h2>Relay: hướng dẫn client và file tải về</h2>
-<p><a href="https://manage.lampt.works/relay/" target="_blank" rel="noopener">https://manage.lampt.works/relay/</a> (máy ngoài tailnet mở qua Cloudflare Access bằng email)</p>
-<ul>
-<li><a href="https://manage.lampt.works/relay/download/9r-relay.ps1" target="_blank" rel="noopener">9r-relay.ps1</a> (Windows)</li>
-<li><a href="https://manage.lampt.works/relay/download/9r-relay.sh" target="_blank" rel="noopener">9r-relay.sh</a> (Linux/macOS)</li>
-<li><a href="https://github.com/cloudflare/cloudflared/releases/latest" target="_blank" rel="noopener">cloudflared releases</a></li>
-</ul>
+<section class="card">
+  <h2>Containers</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Tên</th><th>Trạng thái</th><th>Image</th></tr></thead>
+      <tbody id="containers"><tr><td colspan="3" class="muted">đang tải…</td></tr></tbody>
+    </table>
+  </div>
+  <p class="muted" id="admin-hint" hidden>Bật <b>Administrative access</b> (góc trên bên phải) để xem container và dùng nút cập nhật.</p>
+  <pre class="out" id="out" hidden></pre>
+</section>
+
+<section class="card">
+  <h2>Địa chỉ truy cập</h2>
+  <dl class="kv">
+    <dt>Dashboard (tailnet)</dt><dd><a href="https://9r.lampt.works" target="_blank" rel="noopener">https://9r.lampt.works</a></dd>
+    <dt>API public</dt><dd><code>https://9r.lampt.works/v1</code> (cần API key)</dd>
+    <dt>Local trên VPS</dt><dd><code>http://127.0.0.1:20128/v1</code></dd>
+    <dt>Relay</dt><dd><code>gw.lampt.works</code> → client mở <code>http://127.0.0.1:20130/v1</code></dd>
+  </dl>
+</section>
+
+<section class="card">
+  <h2>Relay: client và file tải về</h2>
+  <p>Hướng dẫn đầy đủ: <a href="/relay/" target="_blank" rel="noopener">manage.lampt.works/relay/</a>. Máy ngoài tailnet mở trang này qua Cloudflare Access, đăng nhập bằng email.</p>
+  <div class="dl">
+    <a href="/relay/download/9r-relay.ps1" download><b>9r-relay.ps1</b><span>Windows: task nền SYSTEM</span></a>
+    <a href="/relay/download/9r-relay.sh" download><b>9r-relay.sh</b><span>Linux / macOS</span></a>
+    <a href="https://github.com/cloudflare/cloudflared/releases/latest" target="_blank" rel="noopener"><b>cloudflared</b><span>bản chính thức</span></a>
+  </div>
+  <h3>Cài nhanh trên Windows</h3>
+  <div class="code"><pre><code>winget install --id Cloudflare.cloudflared
+powershell -ExecutionPolicy Bypass -File .\9r-relay.ps1 -Install</code></pre></div>
+</section>
+
+</div>
 </body>
 </html>

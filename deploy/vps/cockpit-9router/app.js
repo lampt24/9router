@@ -1,28 +1,67 @@
 /* global cockpit */
 document.addEventListener("DOMContentLoaded", () => {
   const $ = (id) => document.getElementById(id);
-  const run = (args, opts = {}) => cockpit.spawn(args, { err: "out", ...opts });
+  const run = (args, opts = {}) => cockpit.spawn(args, { err: "message", ...opts });
+  const pill = (el, text, state) => { el.textContent = text; el.className = "pill" + (state ? " " + state : ""); };
 
-  function refresh() {
+  function health() {
     run(["curl", "-s", "-m", "5", "http://127.0.0.1:20128/api/health"])
-      .then((o) => { $("health").textContent = o.trim(); $("health").className = o.includes('"ok":true') ? "ok" : "bad"; })
-      .catch((e) => { $("health").textContent = "lỗi: " + e; $("health").className = "bad"; });
-    run(["docker", "ps", "--format", "{{.Names}}\t{{.Status}}"], { superuser: "require" })
-      .then((o) => { $("ps").textContent = o.trim(); })
-      .catch((e) => { $("ps").textContent = "Cần bật Administrative access (góc trên bên phải): " + e.message; });
-    run(["systemctl", "list-timers", "9router-update.timer", "--no-pager"])
-      .then((o) => { $("timer").textContent = o.split("\n").slice(0, 2).join("\n"); })
-      .catch((e) => { $("timer").textContent = String(e); });
+      .then((o) => (o.includes('"ok":true') ? pill($("health"), "Hoạt động", "ok") : pill($("health"), "Lỗi: " + o.trim(), "bad")))
+      .catch(() => pill($("health"), "Không phản hồi", "bad"));
   }
+
+  function timer() {
+    run(["systemctl", "show", "9router-update.timer", "-p", "ActiveState", "-p", "NextElapseUSecRealtime", "-p", "LastTriggerUSec"])
+      .then((o) => {
+        const v = Object.fromEntries(o.trim().split("\n").map((l) => [l.split("=")[0], l.slice(l.indexOf("=") + 1)]));
+        if (v.ActiveState === "active") pill($("timer"), "Đang bật", "ok"); else pill($("timer"), v.ActiveState || "không rõ", "bad");
+        $("timer-detail").textContent = "Lần trước: " + (v.LastTriggerUSec || "—") + " · Lần tới: " + (v.NextElapseUSecRealtime || "—");
+      })
+      .catch(() => pill($("timer"), "Không đọc được", "bad"));
+  }
+
+  function containers() {
+    run(["docker", "ps", "-a", "--format", "{{.Names}}\t{{.Status}}\t{{.Image}}"], { superuser: "require" })
+      .then((o) => {
+        $("admin-hint").hidden = true;
+        const rows = o.trim().split("\n").filter(Boolean).map((l) => l.split("\t"));
+        const tb = $("containers"); tb.textContent = "";
+        for (const [name, status, image] of rows) {
+          const tr = document.createElement("tr");
+          const up = /^Up/.test(status);
+          const unhealthy = /unhealthy/.test(status);
+          const td1 = document.createElement("td"); td1.textContent = name;
+          const td2 = document.createElement("td"); const p = document.createElement("span");
+          pill(p, status, up && !unhealthy ? "ok" : "bad"); td2.appendChild(p);
+          const td3 = document.createElement("td"); const c = document.createElement("code"); c.textContent = image; td3.appendChild(c);
+          tr.append(td1, td2, td3); tb.appendChild(tr);
+          if (name === "9router") $("version").textContent = "Image: " + image;
+          if (name === "cloudflared") (up ? pill($("tunnel"), "Đã kết nối", "ok") : pill($("tunnel"), status, "bad"));
+        }
+        return run(["sh", "-c", "docker logs cloudflared --since 24h 2>&1 | grep -c 'Registered tunnel connection'"], { superuser: "require" })
+          .then((n) => { $("tunnel-detail").textContent = "Lượt đăng ký kết nối trong 24h: " + n.trim(); })
+          .catch(() => {});
+      })
+      .catch(() => {
+        $("admin-hint").hidden = false;
+        $("containers").innerHTML = '<tr><td colspan="3" class="muted">Cần quyền quản trị</td></tr>';
+        pill($("tunnel"), "Cần quyền quản trị");
+      });
+  }
+
+  function refresh() { health(); timer(); containers(); }
 
   $("refresh").addEventListener("click", refresh);
   $("update").addEventListener("click", () => {
-    $("out").hidden = false;
-    $("out").textContent = "Đang chạy 9router-update…";
+    const b = $("update"); b.disabled = true;
+    $("out").hidden = false; $("out").textContent = "Đang chạy 9router-update…";
     run(["systemctl", "start", "9router-update.service"], { superuser: "require" })
       .then(() => run(["journalctl", "-u", "9router-update", "-n", "8", "--no-pager", "-o", "cat"], { superuser: "require" }))
       .then((o) => { $("out").textContent = o; refresh(); })
-      .catch((e) => { $("out").textContent = "Lỗi: " + e.message; });
+      .catch((e) => { $("out").textContent = "Lỗi: " + (e.message || e); })
+      .finally(() => { b.disabled = false; });
   });
+
   refresh();
+  setInterval(health, 30000);
 });
