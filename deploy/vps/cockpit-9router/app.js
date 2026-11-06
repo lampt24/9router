@@ -49,7 +49,62 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  function refresh() { health(); timer(); containers(); }
+  // ---- relay devices (argv passed directly to docker exec, never through a shell)
+  const relayCmd = (...args) => run(["docker", "exec", "relay-server", "/9r-relay-server", ...args], { superuser: "require" });
+  const fmt = (iso) => (iso ? new Date(iso).toLocaleString() : "");
+
+  function devices() {
+    relayCmd("devices", "--json")
+      .then((o) => {
+        const data = JSON.parse(o);
+        const tb = $("devices"); tb.textContent = "";
+        if (!data.devices.length) {
+          const tr = document.createElement("tr"); const td = document.createElement("td");
+          td.colSpan = 5; td.className = "muted"; td.textContent = "Chưa có thiết bị nào."; tr.appendChild(td); tb.appendChild(tr);
+        }
+        for (const d of data.devices) {
+          const tr = document.createElement("tr");
+          const cells = [d.name, d.id, fmt(d.created)].map((v) => { const td = document.createElement("td"); td.textContent = v; return td; });
+          const st = document.createElement("td"); const p = document.createElement("span");
+          pill(p, d.revoked ? "Đã thu hồi " + fmt(d.revoked) : "Hoạt động", d.revoked ? "bad" : "ok"); st.appendChild(p);
+          const act = document.createElement("td");
+          if (!d.revoked) {
+            const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = "Thu hồi";
+            b.addEventListener("click", () => {
+              if (!window.confirm(`Thu hồi thiết bị "${d.name}" (${d.id})? Máy này sẽ mất kết nối và phải ghép đôi lại bằng mã mới.`)) return;
+              b.disabled = true;
+              relayCmd("revoke", d.id).then(devices).catch((e) => { window.alert("Lỗi: " + (e.message || e)); b.disabled = false; });
+            });
+            act.appendChild(b);
+          }
+          tr.append(...cells, st, act); tb.appendChild(tr);
+        }
+        $("pending").textContent = data.pending_invites ? `${data.pending_invites} mã ghép đôi chưa dùng (tự hết hạn sau 10 phút).` : "";
+      })
+      .catch(() => {
+        $("devices").innerHTML = '<tr><td colspan="5" class="muted">Cần quyền quản trị, hoặc relay-server chưa chạy</td></tr>';
+      });
+  }
+
+  $("pair-form").addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const name = $("pair-name").value.trim();
+    if (!/^[A-Za-z0-9 ._-]{1,40}$/.test(name)) { window.alert("Tên chỉ gồm chữ, số, khoảng trắng, . _ -"); return; }
+    $("pair-btn").disabled = true;
+    relayCmd("pair-new", "--name", name, "--json")
+      .then((o) => {
+        const r = JSON.parse(o);
+        $("pair-for").textContent = r.name;
+        $("pair-exp").textContent = new Date(r.expires).toLocaleTimeString();
+        $("pair-cmd").textContent = ".\\9r-relay-windows-amd64.exe install " + r.code;
+        $("pair-result").hidden = false;
+        devices();
+      })
+      .catch((e) => window.alert("Lỗi: " + (e.message || e)))
+      .finally(() => { $("pair-btn").disabled = false; });
+  });
+
+  function refresh() { health(); timer(); containers(); devices(); }
 
   $("refresh").addEventListener("click", refresh);
   $("update").addEventListener("click", () => {

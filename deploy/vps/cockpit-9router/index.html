@@ -68,16 +68,36 @@
 </section>
 
 <section class="card">
-  <h2>Relay: client và file tải về</h2>
+  <h2>Thiết bị relay</h2>
+  <p class="muted">Mỗi máy client có một khóa riêng (Noise IK). Thu hồi một máy không ảnh hưởng máy khác; các tunnel đang mở của máy đó đóng trong vòng 30 giây.</p>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Tên</th><th>ID</th><th>Ghép đôi lúc</th><th>Trạng thái</th><th></th></tr></thead>
+      <tbody id="devices"><tr><td colspan="5" class="muted">đang tải…</td></tr></tbody>
+    </table>
+  </div>
+  <p class="muted" id="pending"></p>
+
+  <h3>Tạo mã ghép đôi</h3>
+  <form id="pair-form" class="actions">
+    <input id="pair-name" class="input" type="text" maxlength="40" placeholder="Tên máy, ví dụ company-pc" required pattern="[A-Za-z0-9 ._\-]{1,40}">
+    <button class="btn primary" type="submit" id="pair-btn">Tạo mã (10 phút, dùng 1 lần)</button>
+  </form>
+  <div id="pair-result" hidden>
+    <p>Mã cho <b id="pair-for"></b>, hết hạn lúc <b id="pair-exp"></b>. Chạy trên máy đó, trong PowerShell mở bằng quyền Administrator:</p>
+    <div class="code"><pre><code id="pair-cmd"></code></pre></div>
+    <p class="note">Mã này là bí mật cho tới khi hết hạn: nó chứa invite dùng một lần và service token Cloudflare Access. Chuyển qua kênh an toàn, không dán vào chat công khai.</p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Relay client: tải về và hướng dẫn</h2>
   <p>Hướng dẫn đầy đủ: <a href="/relay/" target="_blank" rel="noopener">manage.lampt.works/relay/</a>. Máy ngoài tailnet mở trang này qua Cloudflare Access, đăng nhập bằng email.</p>
   <div class="dl">
-    <a href="/relay/download/9r-relay.ps1" download><b>9r-relay.ps1</b><span>Windows: task nền SYSTEM</span></a>
-    <a href="/relay/download/9r-relay.sh" download><b>9r-relay.sh</b><span>Linux / macOS</span></a>
-    <a href="https://github.com/cloudflare/cloudflared/releases/latest" target="_blank" rel="noopener"><b>cloudflared</b><span>bản chính thức</span></a>
+    <a href="/relay/download/9r-relay-windows-amd64.exe" download><b>9r-relay-windows-amd64.exe</b><span>Windows x64, chạy như Windows service</span></a>
+    <a href="/relay/download/SHA256SUMS.txt" download><b>SHA256SUMS.txt</b><span>kiểm tra file tải về</span></a>
+    <a href="https://github.com/lampt24/9router/releases?q=relay-v" target="_blank" rel="noopener"><b>GitHub Releases</b><span>các nền tảng khác</span></a>
   </div>
-  <h3>Cài nhanh trên Windows</h3>
-  <div class="code"><pre><code>winget install --id Cloudflare.cloudflared
-powershell -ExecutionPolicy Bypass -File .\9r-relay.ps1 -Install</code></pre></div>
 </section>
 
 </div>

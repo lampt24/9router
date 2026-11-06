@@ -107,6 +107,8 @@ th, td { text-align: left; padding: 9px 10px; border-top: 1px solid var(--line);
 thead th { border-top: 0; color: var(--muted); font-weight: 600; font-size: 13px; }
 .table-scroll { overflow-x: auto; }
 pre.out { background: var(--surface-2); color: var(--fg); border-radius: 10px; padding: 12px 14px; font: 13px/1.5 var(--mono); overflow-x: auto; margin: 0; white-space: pre-wrap; }
+.input { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font: 14px/1.2 inherit; font-family: inherit; }
+.input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 footer { margin-top: 28px; color: var(--muted); font-size: 13px; text-align: center; }
 
 /* Grid/flex children default to min-width:auto and grow to fit long code lines;

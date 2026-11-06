@@ -62,9 +62,15 @@ Host: `/opt/9router/.env` root:600; `data*` owned by 10020, `caddy-*` by 10010, 
 | hostname | public (Cloudflare) | tailnet |
 |---|---|---|
 | `9r.lampt.works` | only `/v1` (API key) + Access email app on the rest | dashboard via Caddy |
-| `gw.lampt.works` | TCP relay → Caddy `127.0.0.1:20129` (only `/v1`, forces XFF) — Access **service token** only | — |
+| `gw.lampt.works` | 9r-relay v1 (see `relay/README.md`): Access **service token** → `relay-server` 127.0.0.1:20140 (Noise IK, per-device keys) → Caddy 127.0.0.1:20129 (only `/v1`) | — |
 | `manage.lampt.works` | only `/relay/*` static docs (Access email) → Caddy `127.0.0.1:20131` | Cockpit (`127.0.0.1:9090`) + `/relay/` |
 
 * Cockpit: `cockpit-ws` socket bound to 127.0.0.1:9090 (`/etc/systemd/system/cockpit.socket.d/listen.conf`), `/etc/cockpit/cockpit.conf` Origins=https://manage.lampt.works. Login user `vpsadmin` (sudo, password in `/root/vpsadmin.pw`; SSH password auth is disabled so it only works in Cockpit).
 * Plugin `cockpit-9router/` → `/usr/share/cockpit/9router/`. Static relay page `manage/` → `/opt/9router/manage` (mounted ro into Caddy).
 * Tailscale split DNS must list both `9r.lampt.works` and `manage.lampt.works` → 100.67.67.24 (CoreDNS).
+
+## 9r-relay (Go)
+
+* `relay-server` container (`ghcr.io/lampt24/9r-relay-server`, uid 65532, read-only, no caps), state in `relay-data/state.json` (server key, devices, hashed invites). `RELAY_CF_ID/RELAY_CF_SECRET` in `.env` are embedded in pairing codes.
+* Pair / list / revoke: Cockpit → 9router & Relay, or `docker exec relay-server /9r-relay-server pair-new|devices|revoke`.
+* `fetch-relay-client.sh` (run by the update timer) mirrors the latest `relay-v*` Windows binaries into `manage/relay/download/` after verifying SHA256SUMS.
