@@ -51,6 +51,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- relay devices (argv passed directly to docker exec, never through a shell)
   const relayCmd = (...args) => run(["docker", "exec", "relay-server", "/9r-relay-server", ...args], { superuser: "require" });
+  // cockpit.spawn with superuser:"require" fails with problem "access-denied" while the
+  // session is in "Limited access" mode; tell the user how to fix it.
+  const ADMIN_HINT = "Cần quyền quản trị: bấm \"Limited access\" ở góc trên bên phải → \"Turn on administrative access\" → nhập mật khẩu vpsadmin, rồi thử lại.";
+  const errText = (e) => (e && e.problem === "access-denied" ? ADMIN_HINT : "Lỗi: " + ((e && e.message) || e));
   const fmt = (iso) => (iso ? new Date(iso).toLocaleString() : "");
 
   function devices() {
@@ -73,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
             b.addEventListener("click", () => {
               if (!window.confirm(`Thu hồi thiết bị "${d.name}" (${d.id})? Máy này sẽ mất kết nối và phải ghép đôi lại bằng mã mới.`)) return;
               b.disabled = true;
-              relayCmd("revoke", d.id).then(devices).catch((e) => { window.alert("Lỗi: " + (e.message || e)); b.disabled = false; });
+              relayCmd("revoke", d.id).then(devices).catch((e) => { window.alert(errText(e)); b.disabled = false; });
             });
             act.appendChild(b);
           }
@@ -82,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         $("pending").textContent = data.pending_invites ? `${data.pending_invites} mã ghép đôi chưa dùng (tự hết hạn sau 10 phút).` : "";
       })
       .catch(() => {
-        $("devices").innerHTML = '<tr><td colspan="5" class="muted">Cần quyền quản trị, hoặc relay-server chưa chạy</td></tr>';
+        $("devices").innerHTML = '<tr><td colspan="5" class="muted"></td></tr>'; $("devices").querySelector("td").textContent = ADMIN_HINT;
       });
   }
 
@@ -100,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
         $("pair-result").hidden = false;
         devices();
       })
-      .catch((e) => window.alert("Lỗi: " + (e.message || e)))
+      .catch((e) => window.alert(errText(e)))
       .finally(() => { $("pair-btn").disabled = false; });
   });
 
@@ -113,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     run(["systemctl", "start", "9router-update.service"], { superuser: "require" })
       .then(() => run(["journalctl", "-u", "9router-update", "-n", "8", "--no-pager", "-o", "cat"], { superuser: "require" }))
       .then((o) => { $("out").textContent = o; refresh(); })
-      .catch((e) => { $("out").textContent = "Lỗi: " + (e.message || e); })
+      .catch((e) => { $("out").textContent = errText(e); })
       .finally(() => { b.disabled = false; });
   });
 
