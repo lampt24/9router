@@ -1,0 +1,11 @@
+9r.lampt.works:53 {
+    bind 100.67.67.24
+    template IN A 9r.lampt.works {
+        answer "9r.lampt.works. 60 IN A 100.67.67.24"
+    }
+    template IN AAAA 9r.lampt.works {
+        rcode NOERROR
+    }
+    log
+    errors
+}

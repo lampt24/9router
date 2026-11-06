@@ -1,0 +1,45 @@
+# Deploy: vps2 (Ubuntu 26.04, Tailscale 100.67.67.24)
+
+```
+                 Internet                                Tailnet
+                    │                                       │
+   Cloudflare (WAF rules) ── Tunnel ──┐       9r.lampt.works → 100.67.67.24 (split DNS → CoreDNS)
+     only ^/v1(/|$) forwarded, rest 404│                       │
+                                       ▼                       ▼
+                               cloudflared ──► 127.0.0.1:20128 ◄── Caddy :443 (bind 100.67.67.24, LE cert via CF DNS-01)
+                                                 9router
+```
+
+* Public: `https://9r.lampt.works/v1/*` only (API key required — the dashboard guard rejects non-loopback `/v1` calls without a key).
+* Tailnet: everything (dashboard, `/v1`) on the same hostname.
+* No inbound ports are opened on the public interface (ufw: only 22 + tailscale0).
+
+## Files (live copy in `/opt/9router`)
+
+| file | purpose |
+|---|---|
+| `docker-compose.yml` | 9router, caddy, coredns, cloudflared (all `network_mode: host`) |
+| `.env` | secrets (`chmod 600`, not in git) — see `.env.example` |
+| `Caddyfile`, `caddy.Dockerfile` | tailnet HTTPS entrypoint |
+| `Corefile` | answers `9r.lampt.works A 100.67.67.24` for tailnet clients |
+| `9router-update.{sh,service,timer}` | pull-based CD, every 10 min |
+
+## CI/CD
+
+1. `ci.yml` — every push/PR to `master`: Docker build + `/api/health` + "no key → 401" check.
+2. Release: bump `package.json` + `cli/package.json`, tag `vX.Y.Z`, push tag.
+   * `docker-publish.yml` → `ghcr.io/lampt24/9router:X.Y.Z` + `:latest` (amd64 + arm64).
+   * `release.yml` → GitHub Release with the installable CLI tarball.
+3. vps2 `9router-update.timer` pulls `:latest` within ~10 min and restarts if the digest changed.
+
+Pin a version instead: `NINEROUTER_TAG=0.5.112` in `.env`, then `docker compose up -d 9router`.
+
+## Ops
+
+```bash
+cd /opt/9router
+docker compose ps
+docker compose logs -f 9router
+systemctl list-timers 9router-update.timer
+journalctl -u 9router-update -n 50
+```

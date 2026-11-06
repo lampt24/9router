@@ -1,0 +1,60 @@
+# 9router on vps2 — see deploy/vps/README.md
+# Everything runs with host networking so 9router sees Caddy/cloudflared as a
+# loopback peer (custom-server.js only trusts X-Forwarded-For from loopback).
+services:
+  9router:
+    image: ghcr.io/lampt24/9router:${NINEROUTER_TAG:-latest}
+    container_name: 9router
+    restart: unless-stopped
+    network_mode: host
+    env_file: .env
+    environment:
+      DATA_DIR: /app/data
+      PORT: "20128"
+      HOSTNAME: 127.0.0.1          # never listen on public interfaces
+      NODE_ENV: production
+      NEXT_PUBLIC_BASE_URL: https://9r.lampt.works
+    volumes:
+      - ./data:/app/data
+      - ./data-home:/app/data-home
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:20128/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Tailnet-only entrypoint: full dashboard on https://9r.lampt.works via 100.67.67.24
+  caddy:
+    build:
+      context: .
+      dockerfile: caddy.Dockerfile
+    image: local/caddy-cloudflare:latest
+    container_name: caddy
+    restart: unless-stopped
+    network_mode: host
+    env_file: .env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy-data:/data
+      - ./caddy-config:/config
+
+  # Split DNS for the tailnet: 9r.lampt.works -> 100.67.67.24
+  coredns:
+    image: coredns/coredns:1.12.4
+    container_name: coredns
+    restart: unless-stopped
+    network_mode: host
+    command: ["-conf", "/etc/coredns/Corefile"]
+    volumes:
+      - ./Corefile:/etc/coredns/Corefile:ro
+
+  # Public entrypoint: Cloudflare Tunnel, ingress only forwards /v1/* (rules live in Cloudflare)
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.4
+    container_name: cloudflared
+    restart: unless-stopped
+    network_mode: host
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}

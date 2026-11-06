@@ -1,0 +1,61 @@
+name: CI
+
+# Fast feedback for every push/PR: the production Docker image must build and
+# answer /api/health. Publishing happens only from vX.Y.Z tags
+# (docker-publish.yml + release.yml).
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  docker-smoke:
+    name: Docker build + health check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image (amd64, not pushed)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: 9router:ci
+          build-args: APP_VERSION=ci-${{ github.sha }}
+          cache-from: type=gha,scope=9router-amd64
+          cache-to: type=gha,mode=max,scope=9router-ci
+          provenance: false
+
+      - name: Health check
+        run: |
+          set -Eeuo pipefail
+          trap 'docker rm -f 9r-ci >/dev/null 2>&1 || true' EXIT
+          docker run -d --name 9r-ci -p 20128:20128 9router:ci
+          for i in {1..45}; do
+            if curl -fsS http://127.0.0.1:20128/api/health; then echo; echo "healthy"; exit 0; fi
+            sleep 2
+          done
+          docker logs 9r-ci || true
+          exit 1
+
+      - name: /v1 rejects requests without API key from non-loopback peers
+        run: |
+          set -Eeuo pipefail
+          trap 'docker rm -f 9r-ci2 >/dev/null 2>&1 || true' EXIT
+          docker run -d --name 9r-ci2 -p 20129:20128 9router:ci
+          for i in {1..45}; do curl -fsS -o /dev/null http://127.0.0.1:20129/api/health && break; sleep 2; done
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H 'X-Forwarded-For: 1.2.3.4' http://127.0.0.1:20129/v1/models)
+          echo "GET /v1/models without key -> $code"
+          [[ "$code" == "401" || "$code" == "403" ]]

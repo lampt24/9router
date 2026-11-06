@@ -1,0 +1,20 @@
+{
+	# Only the Tailscale address — never the public NIC.
+	default_bind {$TS_IP}
+	admin off
+}
+
+9r.lampt.works {
+	tls {
+		dns cloudflare {$CF_DNS_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:20128 {
+		flush_interval -1
+		transport http {
+			read_timeout 0
+			write_timeout 0
+		}
+	}
+}
