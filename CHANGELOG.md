@@ -1,3 +1,8 @@
+# v0.5.114 (2026-11-06)
+
+## Features
+- **UI/UX**: remove redundant top header for a cleaner, full-screen canvas layout; relocate theme toggle, language switcher, and logout controls to the sidebar footer; add dedicated in-page search to Providers; add floating mobile menu button.
+
 # v0.5.113 (2026-11-06)
 
 ## Features

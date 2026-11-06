@@ -11,6 +11,8 @@ import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import useSettingsStore from "@/store/settingsStore";
 import Button from "./Button";
 import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
+import HeaderLanguage from "./HeaderLanguage";
 import { ConfirmModal } from "./Modal";
 
 // const VISIBLE_MEDIA_KINDS = ["embedding", "image", "imageToText", "tts", "stt", "webSearch", "webFetch", "video", "music"];
@@ -103,6 +105,17 @@ export default function Sidebar({ onClose }) {
   const handleCancelUpdate = () => {
     setIsUpdating(false);
     setShutdownCountdown(0);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (res.ok) {
+        window.location.assign("/login");
+      }
+    } catch (err) {
+      console.error("Failed to logout:", err);
+    }
   };
 
   // Note: legacy updater poll removed. New flow: copy install cmd + shutdown server,
@@ -369,6 +382,19 @@ export default function Sidebar({ onClose }) {
           </div>
         </nav>
 
+        {/* Footer controls: Theme, Language, Logout */}
+        <div className="shrink-0 px-4 py-3 border-t border-border/70 flex items-center justify-between gap-1 bg-surface/30">
+          <ThemeToggle variant="default" className="size-8 hover:bg-surface-2 rounded-lg" />
+          <HeaderLanguage />
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center size-8 rounded-lg text-text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+            title="Log out"
+            aria-label="Log out"
+          >
+            <span className="material-symbols-outlined text-[19px]">logout</span>
+          </button>
+        </div>
       </aside>
 
 

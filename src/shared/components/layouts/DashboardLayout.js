@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useNotificationStore } from "@/store/notificationStore";
 import Sidebar from "../Sidebar";
-import Header from "../Header";
 
 function getToastStyle(type) {
   if (type === "success") {
@@ -115,8 +114,18 @@ export default function DashboardLayout({ children }) {
         <div className="absolute -top-24 right-1/4 size-96 bg-brand-500/5 dark:bg-brand-500/10 rounded-full blur-3xl pointer-events-none -z-10" aria-hidden="true" />
         <div className="absolute -bottom-24 left-1/4 size-96 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none -z-10" aria-hidden="true" />
 
-        <Header key={pathname} onMenuClick={() => setSidebarOpen(true)} />
-        <div className={`flex-1 overflow-y-auto custom-scrollbar ${pathname === "/dashboard/basic-chat" ? "" : "p-4 sm:p-6 lg:p-8"} ${pathname === "/dashboard/basic-chat" ? "flex flex-col overflow-hidden" : ""}`}>
+        {/* Mobile menu trigger */}
+        <div className="lg:hidden fixed top-3 left-3 z-30">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="size-9 rounded-xl bg-surface/85 backdrop-blur-md border border-border/70 shadow-sm text-text-main hover:bg-surface-2 transition-colors cursor-pointer flex items-center justify-center active:scale-95"
+            aria-label="Open navigation menu"
+          >
+            <span className="material-symbols-outlined text-[20px]">menu</span>
+          </button>
+        </div>
+
+        <div className={`flex-1 overflow-y-auto custom-scrollbar ${pathname === "/dashboard/basic-chat" ? "" : "p-4 sm:p-6 lg:p-8 pt-14 lg:pt-8"} ${pathname === "/dashboard/basic-chat" ? "flex flex-col overflow-hidden" : ""}`}>
           <div className={`${pathname === "/dashboard/basic-chat" ? "flex-1 w-full h-full flex flex-col" : "max-w-7xl mx-auto"}`}>{children}</div>
         </div>
       </main>

@@ -404,11 +404,23 @@ export default function ProvidersPage() {
 
   return (
     <div className="flex min-w-0 flex-col gap-6 px-1 sm:px-0">
-      <div className="flex items-center justify-end">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">
+            search
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => useHeaderSearchStore.getState().setQuery(e.target.value)}
+            placeholder="Search providers..."
+            className="w-full h-9 pl-9 pr-4 rounded-xl border border-border/80 bg-surface/60 text-xs text-text-main placeholder:text-text-muted/60 outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/30 transition-all"
+          />
+        </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="h-8 rounded-lg border border-black/10 bg-black/[0.02] px-2 text-xs text-text-primary outline-none transition-colors hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/10"
+          className="h-9 rounded-xl border border-border/80 bg-surface/60 px-3 text-xs text-text-main outline-none transition-colors hover:bg-surface-2 focus:border-brand-500/50"
           aria-label="Filter providers by connection status"
         >
           {STATUS_FILTER_OPTIONS.map((option) => (
