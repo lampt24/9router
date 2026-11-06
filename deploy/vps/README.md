@@ -43,3 +43,16 @@ docker compose logs -f 9router
 systemctl list-timers 9router-update.timer
 journalctl -u 9router-update -n 50
 ```
+
+## Hardening
+
+| container | runs as | caps | other |
+|---|---|---|---|
+| 9router | `1000` (node), root `su-exec` entrypoint bypassed | none | `no-new-privileges`, binds 127.0.0.1 only |
+| caddy | `10010`, `cap_net_bind_service` file cap, no setuid files in image | `NET_BIND_SERVICE` only | `read_only`, binds Tailscale IP only |
+| coredns | `65532` | `NET_BIND_SERVICE` only | `read_only` |
+| cloudflared | nonroot | none | `no-new-privileges`, `read_only`, outbound only |
+
+`no-new-privileges` is not set on caddy/coredns because it would block the file capability they need to bind :443/:53 on the host network namespace.
+Each service only receives its own secrets (compose interpolation, no shared `env_file`).
+Host: `/opt/9router/.env` root:600; `data*` owned by 1000, `caddy-*` by 10010, all 700.

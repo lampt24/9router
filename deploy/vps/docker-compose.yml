@@ -1,19 +1,31 @@
 # 9router on vps2 — see deploy/vps/README.md
 # Everything runs with host networking so 9router sees Caddy/cloudflared as a
 # loopback peer (custom-server.js only trusts X-Forwarded-For from loopback).
+# Hardening: no container runs as root, all capabilities dropped (only
+# NET_BIND_SERVICE where a <1024 port is needed), each service only receives
+# the secrets it needs (values come from .env via interpolation, not env_file).
 services:
   9router:
     image: ghcr.io/lampt24/9router:${NINEROUTER_TAG:-latest}
     container_name: 9router
     restart: unless-stopped
     network_mode: host
-    env_file: .env
+    user: "1000:1000"                # 'node' in the image; skip the root su-exec entrypoint
+    entrypoint: []
+    command: ["node", "custom-server.js"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
     environment:
       DATA_DIR: /app/data
+      HOME: /app/data-home           # ~/.9router (usage logs, certs) persisted here
       PORT: "20128"
-      HOSTNAME: 127.0.0.1          # never listen on public interfaces
+      HOSTNAME: 127.0.0.1            # never listen on public interfaces
       NODE_ENV: production
       NEXT_PUBLIC_BASE_URL: https://9r.lampt.works
+      JWT_SECRET: ${JWT_SECRET:?}
+      API_KEY_SECRET: ${API_KEY_SECRET:?}
+      MACHINE_ID_SALT: ${MACHINE_ID_SALT:?}
+      INITIAL_PASSWORD: ${INITIAL_PASSWORD:?}
     volumes:
       - ./data:/app/data
       - ./data-home:/app/data-home
@@ -24,7 +36,7 @@ services:
       retries: 3
       start_period: 30s
 
-  # Tailnet-only entrypoint: full dashboard on https://9r.lampt.works via 100.67.67.24
+  # Tailnet-only entrypoint: full dashboard on https://9r.lampt.works via the Tailscale IP
   caddy:
     build:
       context: .
@@ -33,28 +45,40 @@ services:
     container_name: caddy
     restart: unless-stopped
     network_mode: host
-    env_file: .env
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      TS_IP: ${TS_IP}
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy-data:/data
       - ./caddy-config:/config
 
-  # Split DNS for the tailnet: 9r.lampt.works -> 100.67.67.24
+  # Split DNS for the tailnet: 9r.lampt.works -> Tailscale IP
   coredns:
-    image: coredns/coredns:1.12.4
+    image: coredns/coredns:1.12.4    # runs as nonroot (65532), binary has cap_net_bind_service
     container_name: coredns
     restart: unless-stopped
     network_mode: host
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    read_only: true
     command: ["-conf", "/etc/coredns/Corefile"]
     volumes:
       - ./Corefile:/etc/coredns/Corefile:ro
 
   # Public entrypoint: Cloudflare Tunnel, ingress only forwards /v1/* (rules live in Cloudflare)
   cloudflared:
-    image: cloudflare/cloudflared:2026.10.4
+    image: cloudflare/cloudflared:2026.10.4   # runs as nonroot
     container_name: cloudflared
     restart: unless-stopped
     network_mode: host
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
     command: ["tunnel", "--no-autoupdate", "run"]
     environment:
       TUNNEL_TOKEN: ${TUNNEL_TOKEN}
