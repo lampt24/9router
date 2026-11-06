@@ -1,0 +1,68 @@
+<svg width="220" height="150" viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Primary Brand Gradient -->
+    <linearGradient id="lw-v-brand" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF7A59"/>
+      <stop offset="55%" stop-color="#E56A4A"/>
+      <stop offset="100%" stop-color="#C2410C"/>
+    </linearGradient>
+
+    <!-- Node Glow Filter -->
+    <filter id="lw-v-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Ambient Shadow -->
+    <filter id="lw-v-shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#E56A4A" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Logo Mark Container (Centered at top) -->
+  <g transform="translate(78, 10)" filter="url(#lw-v-shadow)">
+    <!-- Squircle Base -->
+    <rect width="64" height="64" rx="18" fill="url(#lw-v-brand)"/>
+    <rect x="0.5" y="0.5" width="63" height="63" rx="17.5" stroke="white" stroke-opacity="0.3" fill="none"/>
+
+    <!-- Central Routing Core Node -->
+    <circle cx="32" cy="32" r="6" fill="#FFFFFF" filter="url(#lw-v-glow)"/>
+    <circle cx="32" cy="32" r="2.8" fill="#C2410C"/>
+
+    <!-- Converging Routing Streams -->
+    <!-- Top-Left Input Stream -->
+    <path d="M 18 19 L 24 25 L 28 28" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+    <circle cx="18" cy="19" r="2.6" fill="white"/>
+
+    <!-- Top-Right Input Stream -->
+    <path d="M 46 19 L 40 25 L 36 28" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+    <circle cx="46" cy="19" r="2.6" fill="white"/>
+
+    <!-- Bottom Outflow Stream -->
+    <path d="M 32 38 L 32 46" stroke="white" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M 32 46 L 23 50" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+    <path d="M 32 46 L 41 50" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+    <circle cx="23" cy="50" r="2.2" fill="white"/>
+    <circle cx="41" cy="50" r="2.2" fill="white"/>
+
+    <!-- Data Packets -->
+    <circle cx="37.5" cy="23" r="1.5" fill="#FEF08A"/>
+    <circle cx="26.5" cy="23" r="1.5" fill="#FEF08A"/>
+  </g>
+
+  <!-- Typography: lampt.works -->
+  <text x="110" y="108" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', system-ui, sans-serif" font-size="24" font-weight="700" letter-spacing="-0.03em" fill="currentColor">
+    lampt<tspan fill="#E56A4A">.works</tspan>
+  </text>
+
+  <!-- Subtitle: ROUTER -->
+  <g transform="translate(110, 130)">
+    <rect x="-44" y="-12" width="88" height="17" rx="5" fill="#E56A4A" fill-opacity="0.12"/>
+    <text x="0" y="0" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="700" letter-spacing="0.25em" fill="#E56A4A">
+      ROUTER
+    </text>
+  </g>
+</svg>

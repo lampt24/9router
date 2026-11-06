@@ -10,6 +10,7 @@ import { MEDIA_PROVIDER_KINDS } from "@/shared/constants/providers";
 import { useCopyToClipboard } from "@/shared/hooks/useCopyToClipboard";
 import useSettingsStore from "@/store/settingsStore";
 import Button from "./Button";
+import Logo from "./Logo";
 import { ConfirmModal } from "./Modal";
 
 // const VISIBLE_MEDIA_KINDS = ["embedding", "image", "imageToText", "tts", "stt", "webSearch", "webFetch", "video", "music"];
@@ -119,22 +120,12 @@ export default function Sidebar({ onClose }) {
         </div>
 
         {/* Logo */}
-        <div className="px-5 py-3 flex flex-col gap-2">
-          <Link href="/dashboard" className="flex items-center gap-3 group">
-            <div className="flex items-center justify-center size-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-[var(--shadow-warm)] ring-1 ring-white/20 group-hover:scale-105 transition-transform">
-              <span className="material-symbols-outlined text-white text-[22px]">hub</span>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-2">
-                <h1 className="text-base font-bold tracking-tight text-text-main truncate">
-                  {APP_CONFIG.name}
-                </h1>
-                <span className="px-1.5 py-0.5 text-[10px] font-mono font-medium rounded-full bg-surface-2 border border-border/60 text-text-muted">
-                  v{APP_CONFIG.version}
-                </span>
-              </div>
-              <span className="text-xs text-text-muted truncate">AI Infrastructure Gateway</span>
-            </div>
+        <div className="px-5 py-3.5 flex flex-col gap-2">
+          <Link href="/dashboard" className="flex items-center justify-between group">
+            <Logo size="md" />
+            <span className="px-1.5 py-0.5 text-[10px] font-mono font-medium rounded-full bg-surface-2 border border-border/60 text-text-muted shrink-0 group-hover:border-brand-500/30 transition-colors">
+              v{APP_CONFIG.version}
+            </span>
           </Link>
           {updateInfo && (
             <div className="flex flex-col gap-2 rounded-xl p-2.5 border border-green-500/30 bg-green-500/10 dark:border-brand-500/30 dark:bg-brand-500/10 shadow-sm mt-1">

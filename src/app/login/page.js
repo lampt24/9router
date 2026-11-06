@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, Button, Input } from "@/shared/components";
+import { Card, Button, Input, Logo } from "@/shared/components";
 
 export default function LoginPage() {
   const [password, setPassword] = useState("");
@@ -159,10 +159,7 @@ export default function LoginPage() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="size-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-[var(--shadow-warm)] ring-1 ring-white/25 flex items-center justify-center mb-4 text-white shadow-xl">
-            <span className="material-symbols-outlined text-[32px]">hub</span>
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-text-main mb-2">9Router</h1>
+          <Logo variant="stacked" size="xl" className="mb-3" />
           <p className="text-sm text-text-muted max-w-xs leading-relaxed">
             {samlAvailable
               ? "Sign in with SAML 2.0 Single Sign-On"
