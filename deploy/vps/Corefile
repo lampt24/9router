@@ -1,20 +1,22 @@
-# Split DNS for the tailnet (Tailscale: nameserver 100.67.67.24, restrict to domain lampt.works).
-# Names hosted on vps2 resolve to its Tailscale IP; every other *.lampt.works
-# name is forwarded to Cloudflare so it resolves exactly as on the internet.
-lampt.works:53 {
+9r.lampt.works:53 {
     bind 100.67.67.24
-    hosts {
-        100.67.67.24 9r.lampt.works
-        100.67.67.24 manage.lampt.works
-        ttl 60
-        fallthrough
+    template IN A 9r.lampt.works {
+        answer "9r.lampt.works. 60 IN A 100.67.67.24"
     }
-    # Tailnet-only names have no IPv6 here; answer AAAA with NOERROR/empty so
-    # clients don't fall back to the public (Cloudflare) AAAA record.
-    template IN AAAA 9r.lampt.works manage.lampt.works {
+    template IN AAAA 9r.lampt.works {
         rcode NOERROR
     }
-    forward . 1.1.1.1 1.0.0.1
-    cache 60
+    log
+    errors
+}
+
+manage.lampt.works:53 {
+    bind 100.67.67.24
+    template IN A manage.lampt.works {
+        answer "manage.lampt.works. 60 IN A 100.67.67.24"
+    }
+    template IN AAAA manage.lampt.works {
+        rcode NOERROR
+    }
     errors
 }

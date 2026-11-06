@@ -67,4 +67,4 @@ Host: `/opt/9router/.env` root:600; `data*` owned by 10020, `caddy-*` by 10010, 
 
 * Cockpit: `cockpit-ws` socket bound to 127.0.0.1:9090 (`/etc/systemd/system/cockpit.socket.d/listen.conf`), `/etc/cockpit/cockpit.conf` Origins=https://manage.lampt.works. Login user `vpsadmin` (sudo, password in `/root/vpsadmin.pw`; SSH password auth is disabled so it only works in Cockpit).
 * Plugin `cockpit-9router/` → `/usr/share/cockpit/9router/`. Static relay page `manage/` → `/opt/9router/manage` (mounted ro into Caddy).
-* Tailscale split DNS: nameserver 100.67.67.24 restricted to `lampt.works`. CoreDNS answers tailnet-hosted names (hosts block in `Corefile`) and forwards the rest of the zone to 1.1.1.1. To add a tailnet-only service: add a line to the hosts block (+ AAAA template) and a Caddy site.
+* Tailscale split DNS must list both `9r.lampt.works` and `manage.lampt.works` → 100.67.67.24 (CoreDNS).
