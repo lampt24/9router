@@ -1,3 +1,9 @@
+# v0.5.113 (2026-11-06)
+
+## Features
+- **Brand & Identity**: add new modern `lampt.works router` visual identity with dynamic SVG logo assets, favicon, and reusable `<Logo />` component.
+- **UI/UX Overhaul**: overhaul 9Router interface with UI/UX Pro Max design system — enhanced typography, refined dark mode contrast, sleek cards, unified badge styling, ambient gradients, and polished mobile responsiveness.
+
 # v0.5.112 (2026-10-28)
 
 ## Features
