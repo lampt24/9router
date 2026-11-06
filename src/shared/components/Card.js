@@ -17,40 +17,43 @@ export default function Card({
   const paddings = {
     none: "",
     xs: "p-3",
-    sm: "p-4",
-    md: "p-6",
-    lg: "p-8",
+    sm: "p-4 sm:p-5",
+    md: "p-5 sm:p-6",
+    lg: "p-6 sm:p-8",
   };
 
   return (
     <div
       className={cn(
-        "bg-surface border border-border-subtle",
-        elev ? "rounded-[14px] shadow-[var(--shadow-elev)]" : "rounded-[14px] shadow-[var(--shadow-soft)]",
-        hover && "hover:shadow-[var(--shadow-warm)] hover:border-brand-500/30 transition-all cursor-pointer",
+        "bg-surface border border-border/80 transition-all duration-200 ease-out",
+        elev
+          ? "rounded-2xl shadow-[var(--shadow-elev)]"
+          : "rounded-2xl shadow-[var(--shadow-soft)]",
+        hover &&
+          "hover:shadow-[var(--shadow-warm)] hover:border-brand-500/35 hover:-translate-y-[1px] cursor-pointer",
         paddings[padding],
         className
       )}
       {...props}
     >
       {(title || action) && (
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3 min-w-0">
             {icon && (
-              <div className="p-2 rounded-[10px] bg-bg text-text-muted">
+              <div className="size-9 rounded-xl bg-surface-2 border border-border/60 flex items-center justify-center text-text-muted shrink-0">
                 <span className="material-symbols-outlined text-[20px]">{icon}</span>
               </div>
             )}
-            <div>
+            <div className="min-w-0">
               {title && (
-                <h3 className="text-text-main font-semibold">{title}</h3>
+                <h3 className="text-text-main font-semibold text-base tracking-tight truncate">{title}</h3>
               )}
               {subtitle && (
-                <p className="text-sm text-text-muted">{subtitle}</p>
+                <p className="text-xs sm:text-sm text-text-muted truncate mt-0.5">{subtitle}</p>
               )}
             </div>
           </div>
-          {action}
+          {action && <div className="shrink-0">{action}</div>}
         </div>
       )}
       {children}
@@ -62,8 +65,8 @@ Card.Section = function CardSection({ children, className, ...props }) {
   return (
     <div
       className={cn(
-        "p-4 rounded-[10px]",
-        "bg-bg border border-border-subtle",
+        "p-4 rounded-xl",
+        "bg-surface-2/60 border border-border/60",
         className
       )}
       {...props}

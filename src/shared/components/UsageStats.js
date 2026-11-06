@@ -71,12 +71,12 @@ function RecentRequests({ requests = [] }) {
                       <span className={`block w-1.5 h-1.5 rounded-full ${ok ? "bg-success" : "bg-error"}`} />
                     </td>
                     <td className="py-1.5 font-mono truncate max-w-[120px]" title={r.model}>{r.model}</td>
-                    <td className="py-1.5 text-right whitespace-nowrap">
-                      <span className="text-primary">{fmt(r.promptTokens)}↑</span>
+                    <td className="py-2 text-right whitespace-nowrap font-mono tabular-nums">
+                      <span className="text-brand-600 dark:text-brand-400 font-medium">{fmt(r.promptTokens)}↑</span>
                       {" "}
-                      <span className="text-success">{fmt(r.completionTokens)}↓</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">{fmt(r.completionTokens)}↓</span>
                     </td>
-                    <td className="py-1.5 text-right text-text-muted whitespace-nowrap"><TimeAgo timestamp={r.timestamp} /></td>
+                    <td className="py-2 text-right text-text-muted whitespace-nowrap tabular-nums"><TimeAgo timestamp={r.timestamp} /></td>
                   </tr>
                 );
               })}

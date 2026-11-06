@@ -42,26 +42,26 @@ export default function KeyAccessControls({ apiKey, onChange, onRequestRestrict 
         onChange={(checked) => (checked ? onRequestRestrict() : onChange({ restricted: false, allow: access.allow }))}
       />
       {access.restricted && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           {access.allow.length === 0 && (
-            <span className="text-xs text-orange-500">No combos or models allowed — this key can call nothing.</span>
+            <span className="text-xs text-amber-600 dark:text-amber-400">No combos or models allowed — this key can call nothing.</span>
           )}
           {access.allow.map((entry) => (
-            <span key={entry} className="flex items-center gap-1 rounded-xl border border-primary/30 bg-primary/10 px-2 py-0.5 font-mono text-xs text-text-main">
+            <span key={entry} className="inline-flex items-center gap-1.5 rounded-lg border border-brand-500/30 bg-brand-500/10 px-2.5 py-0.5 font-mono text-xs text-text-main">
               {entry}
               <button
                 onClick={() => remove(entry)}
-                className="rounded text-text-muted hover:text-red-500"
+                className="rounded p-0.5 text-text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
                 title={`Remove ${entry}`}
                 aria-label={`Remove ${entry}`}
               >
-                <span className="material-symbols-outlined leading-none" style={{ fontSize: "12px" }}>close</span>
+                <span className="material-symbols-outlined leading-none" style={{ fontSize: "13px" }}>close</span>
               </button>
             </span>
           ))}
           <button
             onClick={openPicker}
-            className="flex items-center gap-0.5 rounded-xl border border-dashed border-black/10 px-2 py-0.5 text-xs font-medium text-primary hover:border-primary/50 dark:border-white/10"
+            className="inline-flex items-center gap-1 rounded-lg border border-dashed border-border hover:border-brand-500/50 hover:bg-brand-500/5 px-2.5 py-1 text-xs font-medium text-brand-600 dark:text-brand-400 transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined leading-none" style={{ fontSize: "14px" }}>add</span>
             Add combo or model

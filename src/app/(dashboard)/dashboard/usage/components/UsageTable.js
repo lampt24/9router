@@ -35,16 +35,16 @@ function ValueCells({ item, viewMode, isSummary = false }) {
   if (viewMode === "tokens") {
     return (
       <>
-        <td className="px-6 py-3 text-right text-text-muted">
+        <td className="px-6 py-3 text-right text-text-muted font-mono tabular-nums text-xs sm:text-sm">
           {isSummary && item.promptTokens === undefined ? "—" : fmt(item.promptTokens)}
         </td>
-        <td className="px-6 py-3 text-right text-text-muted">
+        <td className="px-6 py-3 text-right text-text-muted font-mono tabular-nums text-xs sm:text-sm">
           {item.cachedTokens ? fmt(item.cachedTokens) : "—"}
         </td>
-        <td className="px-6 py-3 text-right text-text-muted">
+        <td className="px-6 py-3 text-right text-text-muted font-mono tabular-nums text-xs sm:text-sm">
           {isSummary && item.completionTokens === undefined ? "—" : fmt(item.completionTokens)}
         </td>
-        <td className="px-6 py-3 text-right font-medium">
+        <td className="px-6 py-3 text-right font-medium font-mono tabular-nums text-xs sm:text-sm">
           {fmt(item.totalTokens)}
         </td>
       </>
@@ -52,16 +52,16 @@ function ValueCells({ item, viewMode, isSummary = false }) {
   }
   return (
     <>
-      <td className="px-6 py-3 text-right text-text-muted">
+      <td className="px-6 py-3 text-right text-text-muted font-mono tabular-nums text-xs sm:text-sm">
         {isSummary && item.inputCost === undefined ? "—" : fmtCost(item.inputCost)}
       </td>
-      <td className="px-6 py-3 text-right text-text-muted">
+      <td className="px-6 py-3 text-right text-text-muted font-mono tabular-nums text-xs sm:text-sm">
         {item.cachedCost ? fmtCost(item.cachedCost) : "—"}
       </td>
-      <td className="px-6 py-3 text-right text-text-muted">
+      <td className="px-6 py-3 text-right text-text-muted font-mono tabular-nums text-xs sm:text-sm">
         {isSummary && item.outputCost === undefined ? "—" : fmtCost(item.outputCost)}
       </td>
-      <td className="px-6 py-3 text-right font-medium text-warning">
+      <td className="px-6 py-3 text-right font-medium text-warning font-mono tabular-nums text-xs sm:text-sm">
         {fmtCost(item.totalCost || item.cost)}
       </td>
     </>

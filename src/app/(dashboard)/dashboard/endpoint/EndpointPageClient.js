@@ -1018,44 +1018,53 @@ export default function APIPageClient({ machineId }) {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2.5">
             {keys.map((key) => (
               <div
                 key={key.id}
-                className={`group flex items-start justify-between gap-3 py-3 border-b border-black/[0.03] dark:border-white/[0.03] last:border-b-0 ${key.isActive === false ? "opacity-60" : ""}`}
+                className={`group flex items-start justify-between gap-3 p-3.5 rounded-xl border border-border/70 bg-surface-2/40 hover:bg-surface-2/80 hover:border-brand-500/30 transition-all duration-150 ${key.isActive === false ? "opacity-60" : ""}`}
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{key.name}</p>
-                  <div className="flex items-center gap-2 mt-1 min-w-0 flex-wrap">
-                    <code className="text-xs text-text-muted font-mono break-all min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-text-main">{key.name}</p>
+                    {key.isActive === false ? (
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                        Paused
+                      </span>
+                    ) : (
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium rounded-full bg-green-500/10 text-green-700 dark:text-green-300 border border-green-500/20">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1.5 min-w-0 flex-wrap">
+                    <code className="text-xs text-text-muted font-mono break-all min-w-0 bg-surface px-2 py-0.5 rounded-lg border border-border/60">
                       {visibleKeys.has(key.id) ? key.key : maskKey(key.key)}
                     </code>
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => toggleKeyVisibility(key.id)}
-                        className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted hover:text-primary transition-all"
+                        className="p-1 hover:bg-surface-2 rounded-lg text-text-muted hover:text-text-main transition-all cursor-pointer"
                         title={visibleKeys.has(key.id) ? "Hide key" : "Show key"}
                       >
-                        <span className="material-symbols-outlined text-[14px]">
+                        <span className="material-symbols-outlined text-[15px]">
                           {visibleKeys.has(key.id) ? "visibility_off" : "visibility"}
                         </span>
                       </button>
                       <button
                         onClick={() => copy(key.key, key.id)}
-                        className="p-1 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted hover:text-primary transition-all"
+                        className="p-1 hover:bg-surface-2 rounded-lg text-text-muted hover:text-brand-500 transition-all cursor-pointer"
+                        title="Copy API key"
                       >
-                        <span className="material-symbols-outlined text-[14px]">
+                        <span className="material-symbols-outlined text-[15px]">
                           {copied === key.id ? "check" : "content_copy"}
                         </span>
                       </button>
                     </div>
                   </div>
-                  <p className="text-xs text-text-muted mt-1">
+                  <p className="text-[11px] text-text-muted mt-1 tabular-nums">
                     Created {new Date(key.createdAt).toLocaleDateString()}
                   </p>
-                  {key.isActive === false && (
-                    <p className="text-xs text-orange-500 mt-1">Paused</p>
-                  )}
                   <KeyAccessControls
                     apiKey={key}
                     onChange={(access) => handleUpdateKeyAccess(key.id, access)}
@@ -1091,7 +1100,8 @@ export default function APIPageClient({ machineId }) {
                   />
                   <button
                     onClick={() => handleDeleteKey(key.id)}
-                    className="p-2 hover:bg-red-500/10 rounded text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                    className="p-1.5 hover:bg-red-500/10 rounded-lg text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all cursor-pointer"
+                    title="Delete API key"
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>
                   </button>

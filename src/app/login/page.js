@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [samlLoginLabel, setSamlLoginLabel] = useState("Sign in with SAML SSO");
   const [mustChange, setMustChange] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Countdown for rate-limit
   useEffect(() => {
@@ -151,36 +152,54 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg p-4 relative overflow-hidden">
-      {/* Faint grid background */}
-      <div className="landing-grid absolute inset-0 pointer-events-none" aria-hidden="true" />
+      {/* Background ambient lighting & grid */}
+      <div className="landing-grid absolute inset-0 pointer-events-none opacity-40 dark:opacity-20" aria-hidden="true" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[450px] bg-brand-500/10 dark:bg-brand-500/15 rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
+      <div className="absolute bottom-10 right-1/4 size-[350px] bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[90px] pointer-events-none" aria-hidden="true" />
+
       <div className="relative z-10 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">9Router</h1>
-          <p className="text-text-muted">
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="size-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-[var(--shadow-warm)] ring-1 ring-white/25 flex items-center justify-center mb-4 text-white shadow-xl">
+            <span className="material-symbols-outlined text-[32px]">hub</span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-text-main mb-2">9Router</h1>
+          <p className="text-sm text-text-muted max-w-xs leading-relaxed">
             {samlAvailable
               ? "Sign in with SAML 2.0 Single Sign-On"
               : oidcAvailable
               ? "Sign in with your OIDC provider to access the dashboard"
-              : "Enter your password to access the dashboard"}
+              : "Enter your password to access the AI gateway dashboard"}
           </p>
         </div>
 
-        <Card>
+        <Card elev className="p-6 sm:p-8 backdrop-blur-xl bg-surface/90 border-border/80 shadow-2xl">
           {mustChange ? (
             <form onSubmit={handleSetNewPassword} className="flex flex-col gap-4">
               <p className="text-sm text-amber-600 dark:text-amber-400 text-center">
                 Set a new password before accessing the dashboard remotely.
               </p>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">New password</label>
-                <Input
-                  type="password"
-                  placeholder="Enter new password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  autoFocus
-                />
+                <label className="text-sm font-medium text-text-main">New password</label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main p-1 cursor-pointer"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
                 {error && <p className="text-xs text-red-500">{error}</p>}
               </div>
               <Button type="submit" variant="primary" className="w-full" loading={loading} disabled={!newPassword}>
@@ -218,15 +237,29 @@ export default function LoginPage() {
                 )}
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium">Password</label>
-                  <Input
-                    type="password"
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoFocus={!oidcAvailable}
-                  />
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-text-main">Password</label>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      autoFocus={!oidcAvailable}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main p-1 cursor-pointer"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        {showPassword ? "visibility_off" : "visibility"}
+                      </span>
+                    </button>
+                  </div>
                   {error && <p className="text-xs text-red-500">{error}</p>}
                   {retryAfter > 0 && (
                     <p className="text-xs text-amber-600 dark:text-amber-400">
@@ -235,7 +268,7 @@ export default function LoginPage() {
                   )}
                   {resetHint && (
                     <p className="text-xs text-text-muted">
-                      Forgot password? Open <code className="bg-sidebar px-1 rounded">9router</code> CLI on the host → <b>Settings</b> → <b>Reset Password to Default</b>.
+                      Forgot password? Open <code className="bg-surface-2 px-1.5 py-0.5 rounded font-mono text-[11px]">9router</code> CLI on the host → <b>Settings</b> → <b>Reset Password to Default</b>.
                     </p>
                   )}
                 </div>
@@ -243,19 +276,19 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full"
+                  className="w-full mt-1"
                   loading={loading}
                   disabled={retryAfter > 0}
                 >
-                  {retryAfter > 0 ? `Wait ${retryAfter}s` : "Login"}
+                  {retryAfter > 0 ? `Wait ${retryAfter}s` : "Sign In"}
                 </Button>
 
                 <p className="text-xs text-center text-text-muted mt-2">
-                  Default password is <code className="bg-sidebar px-1 rounded">123456</code>
+                  Default password is <code className="bg-surface-2 px-1.5 py-0.5 rounded font-mono text-[11px]">123456</code>
                 </p>
                 {hasPassword === false && (
                   <p className="text-xs text-center text-amber-600 dark:text-amber-400">
-                    Security risk: no password set. You will be asked to set one when logging in remotely.
+                    Security notice: no password set. You will be prompted to set one for remote access.
                   </p>
                 )}
               </form>

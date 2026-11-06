@@ -718,15 +718,15 @@ function ProviderCard({ providerId, provider, stats, authType, onToggle }) {
   };
 
   return (
-    <Link href={`/dashboard/providers/${providerId}`} className="group min-w-0">
+    <Link href={`/dashboard/providers/${providerId}`} className="group min-w-0 block h-full">
       <Card
-        padding="xs"
-        className={`h-full hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-colors cursor-pointer ${allDisabled ? "opacity-50" : ""}`}
+        padding="sm"
+        className={`h-full border border-border/70 hover:border-brand-500/40 hover:shadow-[var(--shadow-warm)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${allDisabled ? "opacity-50" : ""}`}
       >
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="size-8 shrink-0 rounded-lg flex items-center justify-center"
+              className="size-10 shrink-0 rounded-xl flex items-center justify-center p-1 border border-black/5 dark:border-white/5 shadow-xs group-hover:scale-105 transition-transform"
               style={{
                 backgroundColor: `${provider.color?.length > 7 ? provider.color : provider.color + "15"}`,
               }}
@@ -743,8 +743,8 @@ function ProviderCard({ providerId, provider, stats, authType, onToggle }) {
               />
             </div>
             <div className="min-w-0">
-              <h3 className="truncate font-semibold">{provider.name}</h3>
-              <div className="flex min-w-0 items-center gap-1.5 text-xs flex-wrap">
+              <h3 className="truncate font-semibold text-sm group-hover:text-brand-500 transition-colors">{provider.name}</h3>
+              <div className="flex min-w-0 items-center gap-1.5 text-xs flex-wrap mt-0.5">
                 {allDisabled ? (
                   <Badge variant="default" size="sm">
                     <span className="flex items-center gap-1">
@@ -846,15 +846,15 @@ function ApiKeyProviderCard({
   };
 
   return (
-    <Link href={`/dashboard/providers/${providerId}`} className="group min-w-0">
+    <Link href={`/dashboard/providers/${providerId}`} className="group min-w-0 block h-full">
       <Card
-        padding="xs"
-        className={`h-full hover:bg-black/[0.01] dark:hover:bg-white/[0.01] transition-colors cursor-pointer ${allDisabled ? "opacity-50" : ""}`}
+        padding="sm"
+        className={`h-full border border-border/70 hover:border-brand-500/40 hover:shadow-[var(--shadow-warm)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer ${allDisabled ? "opacity-50" : ""}`}
       >
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className="size-8 shrink-0 rounded-lg flex items-center justify-center"
+              className="size-10 shrink-0 rounded-xl flex items-center justify-center p-1 border border-black/5 dark:border-white/5 shadow-xs group-hover:scale-105 transition-transform"
               style={{
                 backgroundColor: `${provider.color?.length > 7 ? provider.color : provider.color + "15"}`,
               }}
@@ -871,8 +871,8 @@ function ApiKeyProviderCard({
               />
             </div>
             <div className="min-w-0">
-              <h3 className="truncate font-semibold">{provider.name}</h3>
-              <div className="flex min-w-0 items-center gap-1.5 text-xs flex-wrap">
+              <h3 className="truncate font-semibold text-sm group-hover:text-brand-500 transition-colors">{provider.name}</h3>
+              <div className="flex min-w-0 items-center gap-1.5 text-xs flex-wrap mt-0.5">
                 {allDisabled ? (
                   <Badge variant="default" size="sm">
                     <span className="flex items-center gap-1">

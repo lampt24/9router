@@ -110,36 +110,47 @@ export default function Sidebar({ onClose }) {
 
   return (
     <>
-      <aside className="flex w-72 flex-col border-r border-border-subtle bg-vibrancy backdrop-blur-xl transition-colors duration-300 min-h-full">
+      <aside className="flex w-72 flex-col border-r border-border/80 bg-vibrancy backdrop-blur-xl transition-colors duration-300 min-h-full select-none">
         {/* Traffic lights */}
         <div className="flex items-center gap-2 px-6 pt-5 pb-2">
-          <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-          <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-          <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+          <div className="w-3 h-3 rounded-full bg-[#FF5F56] shadow-sm" />
+          <div className="w-3 h-3 rounded-full bg-[#FFBD2E] shadow-sm" />
+          <div className="w-3 h-3 rounded-full bg-[#27C93F] shadow-sm" />
         </div>
 
         {/* Logo */}
-        <div className="px-6 py-4 flex flex-col gap-2">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-9 rounded-[10px] bg-gradient-to-br from-brand-500 to-brand-700 shadow-[var(--shadow-warm)]">
-              <span className="material-symbols-outlined text-white text-[20px]">hub</span>
+        <div className="px-5 py-3 flex flex-col gap-2">
+          <Link href="/dashboard" className="flex items-center gap-3 group">
+            <div className="flex items-center justify-center size-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-[var(--shadow-warm)] ring-1 ring-white/20 group-hover:scale-105 transition-transform">
+              <span className="material-symbols-outlined text-white text-[22px]">hub</span>
             </div>
-            <div className="flex flex-col">
-              <h1 className="text-lg font-semibold tracking-tight text-text-main">
-                {APP_CONFIG.name}
-              </h1>
-              <span className="text-xs text-text-muted">v{APP_CONFIG.version}</span>
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold tracking-tight text-text-main truncate">
+                  {APP_CONFIG.name}
+                </h1>
+                <span className="px-1.5 py-0.5 text-[10px] font-mono font-medium rounded-full bg-surface-2 border border-border/60 text-text-muted">
+                  v{APP_CONFIG.version}
+                </span>
+              </div>
+              <span className="text-xs text-text-muted truncate">AI Infrastructure Gateway</span>
             </div>
           </Link>
           {updateInfo && (
-            <div className="flex flex-col gap-1.5 rounded p-1 -m-1">
-              <span className="text-xs font-semibold text-green-600 dark:text-amber-500">
-                ↑ New version available: v{updateInfo.latestVersion}
-              </span>
+            <div className="flex flex-col gap-2 rounded-xl p-2.5 border border-green-500/30 bg-green-500/10 dark:border-brand-500/30 dark:bg-brand-500/10 shadow-sm mt-1">
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex size-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full size-2 bg-green-500"></span>
+                </span>
+                <span className="text-xs font-semibold text-green-700 dark:text-brand-300">
+                  Update available: v{updateInfo.latestVersion}
+                </span>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowUpdateModal(true)}
-                  className="px-2 py-1 rounded bg-green-600 hover:bg-green-700 dark:bg-amber-500 dark:hover:bg-amber-600 text-white text-[11px] font-semibold transition-colors cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg bg-green-600 hover:bg-green-700 dark:bg-brand-500 dark:hover:bg-brand-600 text-white text-[11px] font-semibold transition-all shadow-sm active:scale-95 cursor-pointer"
                 >
                   Update now
                 </button>
@@ -148,7 +159,7 @@ export default function Sidebar({ onClose }) {
                   title="Copy install command"
                   className="flex-1 text-left hover:opacity-80 transition-opacity cursor-pointer min-w-0"
                 >
-                  <code className="block text-[10px] text-green-600/80 dark:text-amber-400/70 font-mono truncate">
+                  <code className="block text-[10px] text-green-700 dark:text-brand-300 font-mono truncate">
                     {copied ? "✓ copied!" : INSTALL_CMD}
                   </code>
                 </button>
@@ -158,34 +169,37 @@ export default function Sidebar({ onClose }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-2 space-y-0.5 overflow-y-auto custom-scrollbar">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={cn(
-                "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
-                isActive(item.href)
-                  ? "bg-primary/10 text-primary"
-                  : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-              )}
-            >
-              <span
+        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
                 className={cn(
-                  "material-symbols-outlined text-[18px]",
-                  isActive(item.href) ? "fill-1" : "group-hover:text-primary transition-colors"
+                  "relative flex items-center gap-3 px-3 h-9 rounded-xl transition-all duration-150 group",
+                  active
+                    ? "bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold shadow-sm before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:rounded-r-full before:bg-brand-500"
+                    : "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
                 )}
               >
-                {item.icon}
-              </span>
-              <span className="text-[13px] font-medium">{item.label}</span>
-            </Link>
-          ))}
+                <span
+                  className={cn(
+                    "material-symbols-outlined text-[19px] shrink-0 transition-transform duration-150 group-hover:scale-105",
+                    active ? "fill-1 text-brand-500 dark:text-brand-400" : "group-hover:text-brand-500"
+                  )}
+                >
+                  {item.icon}
+                </span>
+                <span className="text-[13px] tracking-tight">{item.label}</span>
+              </Link>
+            );
+          })}
 
           {/* System section */}
-          <div className="pt-3 mt-2 space-y-0.5">
-            <p className="px-4 text-xs font-semibold text-text-muted/60 uppercase tracking-wider mb-2">
+          <div className="pt-3 mt-3 border-t border-border/50 space-y-1">
+            <p className="px-3 text-[10px] font-bold tracking-widest text-text-muted/60 uppercase mb-1.5">
               System
             </p>
 
@@ -193,103 +207,114 @@ export default function Sidebar({ onClose }) {
             <button
               onClick={() => setMediaOpen((v) => !v)}
               className={cn(
-                "w-full flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
+                "w-full flex items-center gap-3 px-3 h-9 rounded-xl transition-all duration-150 group cursor-pointer",
                 pathname.startsWith("/dashboard/media-providers")
-                  ? "bg-primary/10 text-primary"
-                  : "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                  ? "bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold"
+                  : "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
               )}
             >
-              <span className="material-symbols-outlined text-[18px]">perm_media</span>
-              <span className="text-[13px] font-medium flex-1 text-left">Media Providers</span>
-              <span className="material-symbols-outlined text-[14px] transition-transform" style={{ transform: mediaOpen ? "rotate(180deg)" : "rotate(0deg)" }}>
+              <span className="material-symbols-outlined text-[19px] shrink-0">perm_media</span>
+              <span className="text-[13px] tracking-tight flex-1 text-left">Media Providers</span>
+              <span
+                className="material-symbols-outlined text-[16px] transition-transform duration-200"
+                style={{ transform: mediaOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+              >
                 expand_more
               </span>
             </button>
             {mediaOpen && (
-              <div className="pl-4">
-                {MEDIA_PROVIDER_KINDS.filter((k) => VISIBLE_MEDIA_KINDS.includes(k.id)).map((kind) => (
-                  <Link
-                    key={kind.id}
-                    href={`/dashboard/media-providers/${kind.id}`}
-                    onClick={onClose}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-1 rounded-lg transition-all group",
-                      pathname.startsWith(`/dashboard/media-providers/${kind.id}`)
-                        ? "bg-primary/10 text-primary"
-                        : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-                    )}
-                  >
-                    <span className="material-symbols-outlined text-[16px]">{kind.icon}</span>
-                    <span className="text-sm">{kind.label}</span>
-                  </Link>
-                ))}
+              <div className="pl-3 space-y-0.5 border-l border-border/60 ml-5 my-1">
+                {MEDIA_PROVIDER_KINDS.filter((k) => VISIBLE_MEDIA_KINDS.includes(k.id)).map((kind) => {
+                  const subActive = pathname.startsWith(`/dashboard/media-providers/${kind.id}`);
+                  return (
+                    <Link
+                      key={kind.id}
+                      href={`/dashboard/media-providers/${kind.id}`}
+                      onClick={onClose}
+                      className={cn(
+                        "flex items-center gap-2.5 px-3 h-8 rounded-lg transition-all text-xs",
+                        subActive
+                          ? "bg-brand-500/10 text-brand-600 dark:text-brand-400 font-medium"
+                          : "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
+                      )}
+                    >
+                      <span className="material-symbols-outlined text-[16px] shrink-0">{kind.icon}</span>
+                      <span className="truncate">{kind.label}</span>
+                    </Link>
+                  );
+                })}
                 <Link
                   key={COMBINED_WEB_ITEM.id}
                   href={COMBINED_WEB_ITEM.href}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-1 rounded-lg transition-all group",
+                    "flex items-center gap-2.5 px-3 h-8 rounded-lg transition-all text-xs",
                     pathname.startsWith(COMBINED_WEB_ITEM.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                      ? "bg-brand-500/10 text-brand-600 dark:text-brand-400 font-medium"
+                      : "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
                   )}
                 >
-                  <span className="material-symbols-outlined text-[16px]">{COMBINED_WEB_ITEM.icon}</span>
-                  <span className="text-sm">{COMBINED_WEB_ITEM.label}</span>
+                  <span className="material-symbols-outlined text-[16px] shrink-0">{COMBINED_WEB_ITEM.icon}</span>
+                  <span className="truncate">{COMBINED_WEB_ITEM.label}</span>
                 </Link>
               </div>
             )}
 
-            {systemItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
-                  isActive(item.href)
-                    ? "bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-                )}
-              >
-                <span
-                  className={cn(
-                    "material-symbols-outlined text-[18px]",
-                    isActive(item.href) ? "fill-1" : "group-hover:text-primary transition-colors"
-                  )}
-                >
-                  {item.icon}
-                </span>
-                <span className="text-[13px] font-medium">{item.label}</span>
-              </Link>
-            ))}
-
-            {/* Debug items (inside System section, before Settings) */}
-            {debugItems.map((item) => {
-              const show = item.href !== "/dashboard/translator" || enableTranslator;
-              return show ? (
+            {systemItems.map((item) => {
+              const active = isActive(item.href);
+              return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
-                    isActive(item.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                    "relative flex items-center gap-3 px-3 h-9 rounded-xl transition-all duration-150 group",
+                    active
+                      ? "bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold shadow-sm before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:rounded-r-full before:bg-brand-500"
+                      : "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
                   )}
                 >
                   <span
                     className={cn(
-                      "material-symbols-outlined text-[18px]",
-                      isActive(item.href) ? "fill-1" : "group-hover:text-primary transition-colors"
+                      "material-symbols-outlined text-[19px] shrink-0 transition-transform duration-150 group-hover:scale-105",
+                      active ? "fill-1 text-brand-500 dark:text-brand-400" : "group-hover:text-brand-500"
                     )}
                   >
                     {item.icon}
                   </span>
-                  <span className="text-[13px] font-medium">{item.label}</span>
+                  <span className="text-[13px] tracking-tight">{item.label}</span>
                 </Link>
-              ) : null;
+              );
+            })}
+
+            {/* Debug items */}
+            {debugItems.map((item) => {
+              const show = item.href !== "/dashboard/translator" || enableTranslator;
+              if (!show) return null;
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    "relative flex items-center gap-3 px-3 h-9 rounded-xl transition-all duration-150 group",
+                    active
+                      ? "bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold shadow-sm before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:rounded-r-full before:bg-brand-500"
+                      : "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "material-symbols-outlined text-[19px] shrink-0 transition-transform duration-150 group-hover:scale-105",
+                      active ? "fill-1 text-brand-500 dark:text-brand-400" : "group-hover:text-brand-500"
+                    )}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="text-[13px] tracking-tight">{item.label}</span>
+                </Link>
+              );
             })}
 
             {/* Remote */}
@@ -299,15 +324,15 @@ export default function Sidebar({ onClose }) {
               rel="noreferrer"
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group w-full",
-                "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                "flex items-center gap-3 px-3 h-9 rounded-xl transition-all duration-150 group w-full",
+                "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
               )}
             >
-              <span className="material-symbols-outlined text-[18px] group-hover:text-primary transition-colors">
+              <span className="material-symbols-outlined text-[19px] shrink-0 group-hover:text-brand-500 transition-colors">
                 computer
               </span>
-              <span className="text-[13px] font-medium">9Remote</span>
-              <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-[3px] bg-orange-500/15 text-orange-400">
+              <span className="text-[13px] tracking-tight font-medium">9Remote</span>
+              <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-500 border border-orange-500/20">
                 HOT
               </span>
             </a>
@@ -319,14 +344,14 @@ export default function Sidebar({ onClose }) {
               rel="noreferrer"
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group w-full",
-                "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                "flex items-center gap-3 px-3 h-9 rounded-xl transition-all duration-150 group w-full",
+                "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
               )}
             >
-              <span className="material-symbols-outlined text-[18px] group-hover:text-primary transition-colors">
+              <span className="material-symbols-outlined text-[19px] shrink-0 group-hover:text-brand-500 transition-colors">
                 translate
               </span>
-              <span className="text-[13px] font-medium">9English</span>
+              <span className="text-[13px] tracking-tight font-medium">9English</span>
             </a>
 
             {/* Settings */}
@@ -334,21 +359,21 @@ export default function Sidebar({ onClose }) {
               href="/dashboard/profile"
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
+                "relative flex items-center gap-3 px-3 h-9 rounded-xl transition-all duration-150 group",
                 isActive("/dashboard/profile")
-                  ? "bg-primary/10 text-primary"
-                  : "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                  ? "bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold shadow-sm before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:rounded-r-full before:bg-brand-500"
+                  : "text-text-muted hover:bg-surface-2/70 hover:text-text-main"
               )}
             >
               <span
                 className={cn(
-                  "material-symbols-outlined text-[18px]",
-                  isActive("/dashboard/profile") ? "fill-1" : "group-hover:text-primary transition-colors"
+                  "material-symbols-outlined text-[19px] shrink-0 transition-transform duration-150 group-hover:scale-105",
+                  isActive("/dashboard/profile") ? "fill-1 text-brand-500 dark:text-brand-400" : "group-hover:text-brand-500"
                 )}
               >
                 settings
               </span>
-              <span className="text-[13px] font-medium">Settings</span>
+              <span className="text-[13px] tracking-tight">Settings</span>
             </Link>
           </div>
         </nav>
